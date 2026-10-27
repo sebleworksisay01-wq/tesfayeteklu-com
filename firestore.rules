@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny catch-all safety net: Blocks any unmatched collections or documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Pinned Verified Administrator Authorization Helper
+    // Requires authenticated token with email_verified == true, pinned email, and trusted server custom claim admin == true
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'contactesfaye@gmail.com'
+        && request.auth.token.admin == true;
+    }
+
+    // Document ID Path Sanitization to prevent ID poisoning / DoS attacks
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Connectivity validation endpoint for testConnection()
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // 1. Projects & Demos Collection
+    // Public visitors can only view published projects.
+    // Only the verified administrator with admin claim can view drafts, create, edit, publish, or delete projects.
+    match /projects/{projectId} {
+      allow get: if (resource.data.published == true) || isAdmin();
+      allow list: if (resource.data.published == true) || isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(projectId);
+    }
+
+    // 2. Site Settings & CMS Configuration
+    // Public visitors can read published website identity, navigation, and theme configurations.
+    // Private settings, drafts, internal notes, and administrative configurations are restricted.
+    // Only the verified administrator with admin claim can write or update site settings.
+    match /siteSettings/{settingId} {
+      allow get: if (resource.data.isPrivate != true) || isAdmin();
+      allow list: if (resource.data.isPrivate != true) || isAdmin();
+      allow write: if isAdmin() && isValidId(settingId);
+    }
+
+    // 3. Prospective Client Inquiries
+    // Strictly confidential: Never allow public visitors to read, list, update, or delete inquiries.
+    // Public inquiries are submitted via the validated server-side endpoint (/api/inquiries).
+    // Client SDK read, list, status update, notes, and deletion are strictly restricted to the verified administrator with admin claim.
+    match /inquiries/{inquiryId} {
+      allow read, write: if isAdmin() && isValidId(inquiryId);
+    }
+
+    // 4. Protected Administrative Metadata & Audit Records
+    // Strictly confidential to the verified administrator account with admin claim.
+    match /adminData/{dataId} {
+      allow read, write: if isAdmin() && isValidId(dataId);
+    }
+
+    // 5. User Profiles & Role Protection (Anti-Privilege Escalation)
+    // If user documents exist: users may only read and update their own document.
+    // Users are strictly forbidden from modifying or self-assigning role, isAdmin, or claims.
+    match /users/{userId} {
+      allow read: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == userId
+        && (!('role' in request.resource.data) || request.resource.data.role == null)
+        && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == null)
+        && (!('admin' in request.resource.data) || request.resource.data.admin == null)
+        && (!('claims' in request.resource.data) || request.resource.data.claims == null)
+        && (!('permissions' in request.resource.data) || request.resource.data.permissions == null);
+      allow update: if (
+        request.auth != null && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'admin', 'claims', 'permissions'])
+      ) || isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}

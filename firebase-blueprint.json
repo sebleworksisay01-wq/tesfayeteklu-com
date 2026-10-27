@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "Portfolio demonstration project or client solution record.",
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 200 },
+        "title": { "type": "string", "maxLength": 200 },
+        "shortDescription": { "type": "string", "maxLength": 500 },
+        "description": { "type": "string", "maxLength": 500 },
+        "solutionType": { "type": "string", "enum": ["Website Design", "Mobile Application Development", "Web Application Development"] },
+        "category": { "type": "string", "maxLength": 100 },
+        "subCategory": { "type": "string", "maxLength": 150 },
+        "published": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "thumbnail": { "type": "string", "maxLength": 1024 },
+        "imageUrl": { "type": "string", "maxLength": 1024 },
+        "imagePath": { "type": "string", "maxLength": 512 },
+        "sortOrder": { "type": "number" },
+        "demoUrl": { "type": "string", "maxLength": 1024 }
+      },
+      "required": ["slug", "solutionType", "published"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Centralized global configuration, identity, navigation, and theme.",
+      "type": "object",
+      "properties": {
+        "identity": { "type": "object" },
+        "navigation": { "type": "object" },
+        "theme": { "type": "object" },
+        "home": { "type": "object" },
+        "services": { "type": "array" },
+        "industries": { "type": "array" },
+        "contactForm": { "type": "object" },
+        "seo": { "type": "object" },
+        "version": { "type": "number" },
+        "lastUpdated": { "type": "string" },
+        "isPrivate": { "type": "boolean" }
+      },
+      "required": ["identity", "navigation", "theme"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Prospective client project inquiry or consultation quote request.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "maxLength": 120 },
+        "companyName": { "type": "string", "maxLength": 150 },
+        "email": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "country": { "type": "string", "maxLength": 80 },
+        "solutionType": { "type": "string", "maxLength": 100 },
+        "industry": { "type": "string", "maxLength": 120 },
+        "projectDescription": { "type": "string", "maxLength": 5000 },
+        "requiredFeatures": { "type": "string", "maxLength": 2000 },
+        "budgetRange": { "type": "string", "maxLength": 80 },
+        "expectedCompletionDate": { "type": "string", "maxLength": 80 },
+        "preferredContactMethod": { "type": "string", "enum": ["Email", "Phone", "WhatsApp", "Video Call"] },
+        "status": { "type": "string", "enum": ["New", "Contacted", "In Progress", "Quoted", "Won", "Closed"] }
+      },
+      "required": ["fullName", "email", "projectDescription"]
+    },
+    "AdminData": {
+      "title": "AdminData",
+      "description": "Protected administrator dashboard metadata and counters.",
+      "type": "object",
+      "properties": {
+        "lastActive": { "type": "string" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with anti-privilege escalation constraints.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "avatarUrl": { "type": "string", "maxLength": 512 },
+        "createdAt": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Categorized demo projects and showcase applications."
+    },
+    "/siteSettings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Website CMS content, styling, branding, and navigation options."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Prospective client leads and project requests."
+    },
+    "/adminData/{dataId}": {
+      "schema": "AdminData",
+      "description": "Administrative records restricted to the verified owner."
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Non-privileged user records preventing self-assigned roles."
+    },
+    "/test/{testId}": {
+      "schema": "AdminData",
+      "description": "Connectivity test document for network verification."
+    }
+  }
+}

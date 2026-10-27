@@ -1,0 +1,1453 @@
+{
+  "projects": [
+    {
+      "id": "demo-1-corporate-website",
+      "slug": "nexus-holding-corporate-portal",
+      "name": "Nexus Holdings Corporate Portal",
+      "solutionType": "Website Design",
+      "subCategory": "Corporate and company profile websites",
+      "industries": [
+        "Professional and Consulting Services",
+        "Telecommunications and Technology",
+        "Banking and Financial Services"
+      ],
+      "shortDescription": "Modern corporate architecture showcase with multi-branch directory, investor relations portal, and interactive service catalog.",
+      "overview": "A premium digital presence built for an international investment and holding conglomerate. Engineered to project institutional credibility, streamline stakeholder communications, and deliver investor reports.",
+      "businessProblem": "The client possessed disjointed sub-brand identities across 4 countries with poor mobile responsiveness and no unified investor communication mechanism.",
+      "proposedSolution": "Developed an editorial, high-speed corporate web portal with localized subsidiary directories, interactive financial disclosures, and modular leadership showcases.",
+      "targetUsers": [
+        "Corporate Institutional Investors",
+        "Board Members",
+        "Enterprise Clients",
+        "Media Relations"
+      ],
+      "keyFeatures": [
+        "Interactive multi-entity directory & branch locator",
+        "Secure quarterly investor financial reporting repository",
+        "Sub-second page load speeds with accessible WCAG AA design",
+        "Dynamic case study library with filtered business domains",
+        "Integrated corporate press room and media distribution feed"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Tailwind CSS",
+        "Vite",
+        "Headless CMS API",
+        "Cloudflare CDN"
+      ],
+      "status": "Live Demo",
+      "featured": true,
+      "published": true,
+      "thumbnail": "/src/assets/images/website_design_showcase_1793079157923.jpg",
+      "screenshots": [
+        "/src/assets/images/website_design_showcase_1793079157923.jpg",
+        "/src/assets/images/hero_tech_agency_1793079157707.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/corporate-portal",
+      "interactiveSimulator": "corporate",
+      "createdAt": "2026-03-10T09:00:00Z",
+      "updatedAt": "2026-10-15T14:30:00Z"
+    },
+    {
+      "id": "demo-2-online-shopping",
+      "slug": "lumina-retail-ecommerce-platform",
+      "name": "Lumina Omnichannel E-commerce Platform",
+      "solutionType": "Website Design",
+      "subCategory": "E-commerce websites",
+      "industries": [
+        "Retail and E-commerce"
+      ],
+      "shortDescription": "High-conversion retail marketplace with frictionless instant checkout, real-time SKU inventory sync, and personalized recommendations.",
+      "overview": "Built for high-volume retail merchants requiring real-time warehouse inventory synchronization, fast checkout flows, and automated shipping partner integrations.",
+      "businessProblem": "Legacy checkout cart abandonment exceeded 72% due to sluggish page speeds, rigid payment options, and disconnected stock balances.",
+      "proposedSolution": "Designed a headless microservices storefront with sub-100ms faceted filtering, guest 1-click checkout, and automated multi-currency pricing.",
+      "targetUsers": [
+        "Online Retail Shoppers",
+        "Store Managers",
+        "Fulfillment Staff",
+        "Merchandising Team"
+      ],
+      "keyFeatures": [
+        "Faceted instant category and attribute filters",
+        "One-page streamlined guest & member checkout",
+        "Real-time warehouse SKU inventory availability indicators",
+        "Stripe & local mobile money payment gateway integrations",
+        "Automated dispatch label and invoice generation"
+      ],
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Stripe API",
+        "Tailwind CSS"
+      ],
+      "status": "Interactive Prototype",
+      "featured": true,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+        "/src/assets/images/website_design_showcase_1793079157923.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/lumina-ecommerce",
+      "interactiveSimulator": "ecommerce",
+      "createdAt": "2026-04-12T11:00:00Z",
+      "updatedAt": "2026-10-18T10:15:00Z"
+    },
+    {
+      "id": "demo-3-hotel-booking",
+      "slug": "serengeti-safari-hotel-booking",
+      "name": "Serengeti Vista Hotel & Resort Booking System",
+      "solutionType": "Website Design",
+      "subCategory": "Hotel and tourism websites",
+      "industries": [
+        "Hospitality, Hotels and Tourism"
+      ],
+      "shortDescription": "Immersive lodge and resort booking website with interactive room visualizer, availability calendar, and curated safari itinerary builder.",
+      "overview": "Engineered for luxury hospitality operators seeking to capture direct, commission-free guest reservations with rich visual storytelling and seasonal pricing engines.",
+      "businessProblem": "Over-reliance on Online Travel Agencies (OTAs) charging 18-25% commissions, coupled with manual double-booking headaches across multiple reservation channels.",
+      "proposedSolution": "Direct-to-guest booking engine with calendar date pickers, real-time room lockouts, localized activity add-ons, and multi-language support.",
+      "targetUsers": [
+        "International Tourists",
+        "Corporate Retreat Coordinators",
+        "Front Desk Staff",
+        "Reservation Managers"
+      ],
+      "keyFeatures": [
+        "Interactive visual room picker with 360° virtual tours",
+        "Instant date range availability and seasonal rate engine",
+        "Curated itinerary bundle add-on builder (Spa, Safari, Airport Transfer)",
+        "Automated guest itinerary confirmation via Email and SMS",
+        "iCal/Channel Manager synchronization with global OTAs"
+      ],
+      "technologies": [
+        "React 19",
+        "Tailwind CSS",
+        "Express",
+        "Vite",
+        "Google Maps API"
+      ],
+      "status": "Interactive Prototype",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/website_design_showcase_1793079157923.jpg",
+      "screenshots": [
+        "/src/assets/images/website_design_showcase_1793079157923.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/serengeti-resort",
+      "interactiveSimulator": "hotel",
+      "createdAt": "2026-05-01T08:30:00Z",
+      "updatedAt": "2026-09-20T16:00:00Z"
+    },
+    {
+      "id": "demo-4-school-management",
+      "slug": "academiq-school-management-system",
+      "name": "AcademiQ K-12 & University Portal",
+      "solutionType": "Web Application Development",
+      "subCategory": "School management systems",
+      "industries": [
+        "Education and Training",
+        "Government and Public Services"
+      ],
+      "shortDescription": "Comprehensive academic ERP handling student enrollment, automated grading rubrics, parent portals, and timetable scheduling.",
+      "overview": "A full-stack campus management platform that bridges administrative staff, educators, students, and parents into one unified academic workflow.",
+      "businessProblem": "Paper-based attendance, delayed grade report cards, and chaotic fee reconciliation across hundreds of active student accounts.",
+      "proposedSolution": "Unified web portal featuring automated biometric attendance, automated transcript generation, fee balance alerts, and digital assignment submission.",
+      "targetUsers": [
+        "Principals & Headmasters",
+        "Academic Teachers",
+        "Students",
+        "Guardians and Parents"
+      ],
+      "keyFeatures": [
+        "Student information management & admissions tracking",
+        "Automated gradebook and cumulative GPA calculation engine",
+        "Parent portal with real-time attendance and fee statements",
+        "Automated conflict-free timetable and exam scheduler",
+        "Digital assignment submission and teacher feedback grading"
+      ],
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Express",
+        "Tailwind CSS"
+      ],
+      "status": "Live Demo",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/academiq-school",
+      "createdAt": "2026-05-18T14:00:00Z",
+      "updatedAt": "2026-10-02T11:45:00Z"
+    },
+    {
+      "id": "demo-5-hrms-suite",
+      "slug": "pulse-hrms-enterprise-suite",
+      "name": "PulseHR Enterprise Workforce Platform",
+      "solutionType": "Web Application Development",
+      "subCategory": "Human Resource Management Systems (HRMS)",
+      "industries": [
+        "Human Resources and Recruitment",
+        "Professional and Consulting Services",
+        "Manufacturing and Distribution"
+      ],
+      "shortDescription": "Complete human resource management suite with biometric attendance, automated multi-tax payroll calculation, and KPI appraisal reviews.",
+      "overview": "Engineered for enterprises with 50 to 5,000+ employees to automate leave balances, tax compliance deductions, shifts, and internal talent mobility.",
+      "businessProblem": "HR teams spending over 80 hours monthly calculating overtime, leave accruals, and manual tax tables across multi-tiered regional offices.",
+      "proposedSolution": "Automated rules engine that processes payroll in under 3 minutes, tracks leave requests with hierarchical approvals, and generates bank disbursement files.",
+      "targetUsers": [
+        "Chief People Officers",
+        "Payroll Accountants",
+        "Department Leads",
+        "Company Employees"
+      ],
+      "keyFeatures": [
+        "1-click automated multi-bracket payroll & payslip distribution",
+        "Interactive organizational chart and department hierarchy builder",
+        "Employee self-service leave requests with multi-tier approval",
+        "Biometric clock-in integration with shift roster management",
+        "Performance 360-degree review and KPI goal tracking modules"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Node.js",
+        "Tailwind CSS",
+        "REST API",
+        "PDF Generation"
+      ],
+      "status": "Interactive Prototype",
+      "featured": true,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+        "/src/assets/images/hero_tech_agency_1793079157707.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/pulse-hrms",
+      "interactiveSimulator": "hrms",
+      "createdAt": "2026-06-01T10:00:00Z",
+      "updatedAt": "2026-10-20T08:30:00Z"
+    },
+    {
+      "id": "demo-6-inventory-erp",
+      "slug": "stockvault-inventory-management-system",
+      "name": "StockVault Warehouse & Inventory Management System",
+      "solutionType": "Web Application Development",
+      "subCategory": "Inventory Management Systems",
+      "industries": [
+        "Manufacturing and Distribution",
+        "Retail and E-commerce",
+        "Transportation and Logistics"
+      ],
+      "shortDescription": "Multi-warehouse stock control system featuring barcode scanning, low-stock predictive replenishment, and automated vendor purchase orders.",
+      "overview": "A mission-critical logistics and warehouse inventory application built to eliminate stock-outs, minimize holding overhead, and track bin locations.",
+      "businessProblem": "Over $120,000 in annual dead stock and recurring order fulfillment errors due to manual spreadsheet tallying and delayed receiving docks.",
+      "proposedSolution": "Real-time perpetual inventory system with handheld barcode scanning support, supplier lead-time modeling, and batch expiry tracking.",
+      "targetUsers": [
+        "Warehouse Supervisors",
+        "Procurement Managers",
+        "Pick-and-Pack Operators",
+        "Supply Chain VPs"
+      ],
+      "keyFeatures": [
+        "Multi-warehouse and aisle/shelf/bin location tracking",
+        "Instant barcode scanning and label printing integration",
+        "Predictive safety stock threshold notifications and reorder triggers",
+        "Supplier purchase order lifecycle and automated receiving verification",
+        "FIFO/LIFO stock valuation audit reports"
+      ],
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Express",
+        "PostgreSQL",
+        "Web Barcode API"
+      ],
+      "status": "Live Demo",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/stockvault",
+      "createdAt": "2026-06-25T13:00:00Z",
+      "updatedAt": "2026-09-14T11:20:00Z"
+    },
+    {
+      "id": "demo-7-insurance-portal",
+      "slug": "insurashield-policy-claims-portal",
+      "name": "InsuraShield Policy & Reinsurance Claims Portal",
+      "solutionType": "Web Application Development",
+      "subCategory": "Insurance and reinsurance management systems",
+      "industries": [
+        "Insurance and Reinsurance",
+        "Banking and Financial Services",
+        "Legal and Business Services"
+      ],
+      "shortDescription": "Enterprise underwriting and claims assessment system with digital policy issuance, fraud detection heuristics, and risk treaties.",
+      "overview": "Built for insurance underwriters and brokers handling retail policies (auto, life, health) as well as commercial reinsurance treaty allocations.",
+      "businessProblem": "Claims processing cycles averaged 21 business days, creating customer dissatisfaction and high vulnerability to undetected fraudulent filings.",
+      "proposedSolution": "Modernized policy portal that reduces simple claim approvals to under 4 hours using algorithmic validation and straight-through processing.",
+      "targetUsers": [
+        "Insurance Underwriters",
+        "Claims Adjusters",
+        "Policyholders",
+        "Reinsurance Brokers"
+      ],
+      "keyFeatures": [
+        "Digital policy quoting and instant bind with electronic signatures",
+        "Step-by-step FNOL (First Notice of Loss) claims filing wizard",
+        "Automated fraud score heuristics and document tamper check",
+        "Treaty quota share and excess-of-loss reinsurance ledger",
+        "Automated reserve fund calculation and settlement dispatch"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Document Vault"
+      ],
+      "status": "Production Project",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/insurashield",
+      "createdAt": "2026-07-04T09:00:00Z",
+      "updatedAt": "2026-10-10T15:00:00Z"
+    },
+    {
+      "id": "demo-8-clinic-appointment",
+      "slug": "mediconnect-clinic-appointment-app",
+      "name": "MediConnect Patient & Clinic Appointment App",
+      "solutionType": "Mobile Application Development",
+      "subCategory": "Healthcare and appointment apps",
+      "industries": [
+        "Healthcare and Pharmaceuticals"
+      ],
+      "shortDescription": "Patient mobile app for specialist doctor bookings, telemedicine consultations, prescription renewals, and digital lab results.",
+      "overview": "A patient-first healthcare mobile application created to optimize clinic queue times, reduce no-shows by 45%, and secure patient health data.",
+      "businessProblem": "Overcrowded clinic waiting rooms, 30% patient appointment no-show rate, and lost physical laboratory result paper slips.",
+      "proposedSolution": "Native-feel mobile app providing instant specialist discovery, real-time consultation slot reservation, SMS/Push reminders, and lab result sync.",
+      "targetUsers": [
+        "Patients and Families",
+        "Specialist Physicians",
+        "Clinic Receptionists",
+        "Lab Technicians"
+      ],
+      "keyFeatures": [
+        "Specialist doctor directory filtered by symptoms and department",
+        "Real-time doctor calendar booking with instant confirmation",
+        "In-app encrypted tele-health video consult room",
+        "Digital health vault for lab tests, blood panels, and prescriptions",
+        "Automated SMS & push notifications for upcoming appointments"
+      ],
+      "technologies": [
+        "React Native / React Mobile",
+        "TypeScript",
+        "Tailwind",
+        "WebRTC",
+        "HIPAA-compliant Data Store"
+      ],
+      "status": "Interactive Prototype",
+      "featured": true,
+      "published": true,
+      "thumbnail": "/src/assets/images/mobile_app_mockup_1793079158082.jpg",
+      "screenshots": [
+        "/src/assets/images/mobile_app_mockup_1793079158082.jpg",
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/mediconnect-app",
+      "interactiveSimulator": "clinic",
+      "createdAt": "2026-07-19T10:15:00Z",
+      "updatedAt": "2026-10-22T17:40:00Z"
+    },
+    {
+      "id": "demo-9-restaurant-ordering",
+      "slug": "tastecraft-restaurant-ordering-app",
+      "name": "TasteCraft Food Ordering & Table Delivery App",
+      "solutionType": "Mobile Application Development",
+      "subCategory": "Food ordering and delivery apps",
+      "industries": [
+        "Restaurants and Food Services",
+        "Retail and E-commerce"
+      ],
+      "shortDescription": "Custom culinary ordering app supporting contactless table QR ordering, curbside delivery tracking, and loyalty rewards.",
+      "overview": "Created for restaurant chains and independent cafes seeking their own branded delivery channel without paying 30% marketplace middleman fees.",
+      "businessProblem": "Heavy third-party aggregator commissions eroded food profit margins, while front-of-house staff struggled with order transcription mistakes.",
+      "proposedSolution": "Direct branded mobile app allowing patrons to customize dishes, split bills, earn reward points, and track live kitchen prep status.",
+      "targetUsers": [
+        "Dine-in and Takeout Guests",
+        "Head Chefs & Kitchen Staff",
+        "Delivery Drivers",
+        "Restaurant Owners"
+      ],
+      "keyFeatures": [
+        "Interactive visual digital menu with dietary tags and modifiers",
+        "Dine-in table QR ordering and split-check mobile payments",
+        "Live kitchen preparation status tracker (Order Placed -> In Oven -> Ready)",
+        "Automated driver dispatch and real-time GPS delivery map",
+        "Gamified loyalty points and exclusive birthday perks program"
+      ],
+      "technologies": [
+        "React Mobile",
+        "TypeScript",
+        "Node.js",
+        "Socket.io",
+        "Google Maps API"
+      ],
+      "status": "Interactive Prototype",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/mobile_app_mockup_1793079158082.jpg",
+      "screenshots": [
+        "/src/assets/images/mobile_app_mockup_1793079158082.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/tastecraft",
+      "createdAt": "2026-08-05T12:00:00Z",
+      "updatedAt": "2026-09-28T09:10:00Z"
+    },
+    {
+      "id": "demo-10-real-estate-portal",
+      "slug": "habitat-real-estate-platform",
+      "name": "Habitat Prime Real Estate & Property Portal",
+      "solutionType": "Website Design",
+      "subCategory": "Real estate websites",
+      "industries": [
+        "Real Estate and Construction",
+        "Banking and Financial Services"
+      ],
+      "shortDescription": "High-end property showcase with interactive masterplan maps, mortgage affordability calculator, and automated viewing scheduler.",
+      "overview": "A luxury property brokerage and developer portal showcasing commercial towers, gated residential developments, and leasing portfolios.",
+      "businessProblem": "Static property PDF brochures resulted in poor lead qualification and low conversion of overseas diaspora buyers.",
+      "proposedSolution": "Dynamic property portal with filterable neighborhood amenities, embedded floor plans, mortgage simulators, and WhatsApp agent booking.",
+      "targetUsers": [
+        "Property Buyers",
+        "Real Estate Brokers",
+        "Property Developers",
+        "Mortgage Officers"
+      ],
+      "keyFeatures": [
+        "Interactive map search with school, transit, and shopping overlays",
+        "High-resolution floorplan viewer and unit availability matrix",
+        "Real-time mortgage amortization and down-payment calculator",
+        "One-click agent viewing tour booking with calendar sync",
+        "Investor ROI and projected rental yield forecasting charts"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Tailwind CSS",
+        "Vite",
+        "MapLibre"
+      ],
+      "status": "Live Demo",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/website_design_showcase_1793079157923.jpg",
+      "screenshots": [
+        "/src/assets/images/website_design_showcase_1793079157923.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/habitat-realestate",
+      "createdAt": "2026-08-20T15:30:00Z",
+      "updatedAt": "2026-10-05T13:20:00Z"
+    },
+    {
+      "id": "demo-11-logistics-dashboard",
+      "slug": "fleetpulse-logistics-tracking-dashboard",
+      "name": "FleetPulse Freight & Logistics Command Dashboard",
+      "solutionType": "Web Application Development",
+      "subCategory": "Transport and logistics apps",
+      "industries": [
+        "Transportation and Logistics",
+        "Manufacturing and Distribution",
+        "Agriculture and Agribusiness"
+      ],
+      "shortDescription": "Real-time telemetry and shipment dispatch dashboard tracking freight fleets, driver duty hours, fuel consumption, and cargo temperature.",
+      "overview": "Designed for logistics carriers, cold-chain distributors, and 3PL providers managing cross-country truck fleets and freight consignments.",
+      "businessProblem": "Delayed cargo tracking updates, high fuel pilferage, and lack of temperature auditing causing perishable food and medicine spoilage.",
+      "proposedSolution": "Centralized telemetry dashboard with geofence breach alerts, cold-chain sensor graphs, automated dispatch routing, and digital bill of lading.",
+      "targetUsers": [
+        "Fleet Dispatchers",
+        "Supply Chain Directors",
+        "Safety Officers",
+        "Consignee Clients"
+      ],
+      "keyFeatures": [
+        "Live GPS fleet map with speed, route deviation, and idle alerts",
+        "Cold-chain IoT temperature and humidity real-time sensor charts",
+        "Automated digital Bill of Lading (eBOL) and electronic proof of delivery",
+        "Driver Hours-of-Service (HOS) regulatory compliance monitoring",
+        "Automated fuel consumption and maintenance reminder schedule"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Express",
+        "WebSockets",
+        "Chart.js",
+        "Tailwind CSS"
+      ],
+      "status": "Production Project",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+        "/src/assets/images/hero_tech_agency_1793079157707.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/fleetpulse",
+      "createdAt": "2026-09-02T08:00:00Z",
+      "updatedAt": "2026-10-14T10:00:00Z"
+    },
+    {
+      "id": "demo-12-enterprise-crm",
+      "slug": "relatify-enterprise-crm-system",
+      "name": "Relatify B2B Customer Relationship Management System",
+      "solutionType": "Web Application Development",
+      "subCategory": "Customer Relationship Management (CRM)",
+      "industries": [
+        "Professional and Consulting Services",
+        "Telecommunications and Technology",
+        "Banking and Financial Services"
+      ],
+      "shortDescription": "End-to-end sales pipeline CRM with deal stage automation, communication timeline logging, contract generation, and revenue forecasting.",
+      "overview": "A focused, high-speed CRM platform customized for B2B enterprises that want clear pipeline visibility without the bloat of legacy platforms.",
+      "businessProblem": "Sales reps losing track of high-value prospects across messy inboxes, leading to slipped deals and inaccurate quarterly forecasts.",
+      "proposedSolution": "Visual drag-and-drop deal board with email thread synchronization, automated follow-up reminders, and AI-assisted proposal drafting.",
+      "targetUsers": [
+        "VP of Sales",
+        "Account Executives",
+        "Customer Success Managers",
+        "Revenue Operations"
+      ],
+      "keyFeatures": [
+        "Visual Kanban deal pipeline with custom stages and win probabilities",
+        "Complete contact timeline logging calls, emails, and meetings",
+        "Automated quote and commercial proposal PDF generation",
+        "Weighted revenue forecasting and team quota leaderboards",
+        "Integration with Google Workspace, Microsoft 365, and Slack"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "Express",
+        "PostgreSQL",
+        "Tailwind CSS"
+      ],
+      "status": "Live Demo",
+      "featured": false,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/relatify-crm",
+      "createdAt": "2026-09-15T11:30:00Z",
+      "updatedAt": "2026-10-24T16:15:00Z"
+    },
+    {
+      "id": "demo-13-pos-retail",
+      "slug": "apex-pos-retail-checkout",
+      "name": "Apex Modern Point of Sale (POS) System",
+      "solutionType": "Web Application Development",
+      "subCategory": "Point of Sale (POS) systems",
+      "industries": [
+        "Retail and E-commerce",
+        "Restaurants and Food Services"
+      ],
+      "shortDescription": "High-speed touch-first POS register system with offline queueing, barcode scanning, split payments, and end-of-day register balancing.",
+      "overview": "Engineered for high-throughput retail stores, boutiques, and multi-lane supermarkets needing instant checkout and offline resilience.",
+      "businessProblem": "Slow checkout queues, network drops causing register freezes, and cash drawer discrepancies during shift handovers.",
+      "proposedSolution": "Local-first touch register with 1-tap fast keys, offline transaction caching, multi-tender split payments, and automated thermal receipt printing.",
+      "targetUsers": [
+        "Store Cashiers",
+        "Retail Managers",
+        "Store Owners",
+        "Inventory Auditors"
+      ],
+      "keyFeatures": [
+        "Touch-optimized barcode checkout with instant subtotal and tax calculation",
+        "Full offline resilience with automatic sync when connectivity restores",
+        "Split tender support (Cash, Card, Mobile Payment, Store Credit)",
+        "Digital receipt delivery via SMS/Email and thermal printer integration",
+        "Shift cash drawer opening/closing reconciliation reports"
+      ],
+      "technologies": [
+        "React 19",
+        "TypeScript",
+        "IndexedDB",
+        "Tailwind CSS",
+        "Web Serial API"
+      ],
+      "status": "Interactive Prototype",
+      "featured": true,
+      "published": true,
+      "thumbnail": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+      "screenshots": [
+        "/src/assets/images/web_app_dashboard_1793079158006.jpg"
+      ],
+      "demoUrl": "https://demo.tesfayetech.com/apex-pos",
+      "interactiveSimulator": "pos",
+      "createdAt": "2026-09-22T14:00:00Z",
+      "updatedAt": "2026-10-25T11:00:00Z"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "inq-1793079802213",
+      "fullName": "Test Client",
+      "companyName": "Independent / Individual",
+      "email": "client@test.com",
+      "phone": "Not provided",
+      "country": "Unspecified",
+      "solutionType": "General Consultation",
+      "industry": "Professional and Consulting Services",
+      "projectDescription": "Test inquiry for ERP system",
+      "requiredFeatures": "Detailed in description",
+      "budgetRange": "Flexible / Discussion",
+      "expectedCompletionDate": "Flexible",
+      "preferredContactMethod": "Email",
+      "status": "New",
+      "internalNotes": [],
+      "createdAt": "2026-10-27T05:43:22.213Z"
+    },
+    {
+      "id": "inq-101",
+      "fullName": "Abebe Tadesse",
+      "companyName": "Horn Heritage Logistics",
+      "email": "abebe.t@hornlogistics.et",
+      "phone": "+251 911 556 789",
+      "country": "Ethiopia",
+      "solutionType": "Web Application Development",
+      "industry": "Transportation and Logistics",
+      "projectDescription": "We need a custom freight tracking and dispatch dashboard to monitor our fleet of 65 intercity transport trucks, integrate IoT fuel sensors, and replace manual paper manifests.",
+      "requiredFeatures": "GPS fleet tracking, IoT fuel monitor integration, driver trip logs, automated billing, SMS notification to cargo consignees.",
+      "budgetRange": "$15,000 - $30,000",
+      "expectedCompletionDate": "2027-02-15",
+      "preferredContactMethod": "Email",
+      "status": "New",
+      "internalNotes": [
+        {
+          "id": "note-1",
+          "author": "Lead Solutions Architect",
+          "text": "Reviewed initial brief. High similarity with FleetPulse architecture. Prepared preliminary scope deck.",
+          "date": "2026-10-25T14:20:00Z"
+        }
+      ],
+      "relatedProjectId": "demo-11-logistics-dashboard",
+      "createdAt": "2026-10-25T12:30:00Z"
+    },
+    {
+      "id": "inq-102",
+      "fullName": "Sara Al-Mansoor",
+      "companyName": "Oasis Health Clinics Group",
+      "email": "sara.mansoor@oasisclinics.ae",
+      "phone": "+971 50 123 4567",
+      "country": "United Arab Emirates",
+      "solutionType": "Mobile Application Development",
+      "industry": "Healthcare and Pharmaceuticals",
+      "projectDescription": "Looking to develop a bilingual (English/Arabic) patient mobile application for booking 4 multi-specialty polyclinics in Dubai, with lab test result downloads and telehealth.",
+      "requiredFeatures": "Doctor booking calendar, bilingual RTL support, patient medical records vault, insurance card scan, Apple Pay / Card payments.",
+      "budgetRange": "$25,000 - $50,000",
+      "expectedCompletionDate": "2027-04-01",
+      "preferredContactMethod": "Video Call",
+      "status": "In Progress",
+      "internalNotes": [
+        {
+          "id": "note-2",
+          "author": "TesfayeTech PM",
+          "text": "Discovery call held on Oct 24. Client impressed with MediConnect demo. Preparing detailed technical proposal.",
+          "date": "2026-10-24T16:00:00Z"
+        }
+      ],
+      "relatedProjectId": "demo-8-clinic-appointment",
+      "createdAt": "2026-10-23T08:15:00Z"
+    }
+  ],
+  "cms": {
+    "version": 1,
+    "lastUpdated": "2026-10-27T06:52:50.018Z",
+    "identity": {
+      "companyName": "TesfayeTech",
+      "tagline": "We Design and Build Digital Solutions for Your Business.",
+      "subtagline": "Engineering high-performance websites, custom web applications, mobile platforms, and enterprise automation software designed to scale organizations.",
+      "logoText": "TesfayeTech",
+      "logoUrl": "",
+      "faviconUrl": "",
+      "email": "info@tesfayetech.com",
+      "phone": "+1 (800) 456-7890 / +251 911 234 567",
+      "whatsapp": "+251 911 234 567",
+      "address": "Tesfaye Innovation Tower, Level 4, Tech Innovation Corridor",
+      "businessLocation": "Bole Innovation District, Addis Ababa & Remote Global",
+      "socialLinks": {
+        "linkedin": "https://linkedin.com/company/tesfayetech",
+        "github": "https://github.com/tesfayetech",
+        "twitter": "https://twitter.com/tesfayetech",
+        "youtube": "https://youtube.com/@tesfayetech"
+      },
+      "announcementBar": {
+        "enabled": false,
+        "text": "Now accepting enterprise Q1 software engineering contracts and custom ERP discovery audits.",
+        "linkUrl": "#inquiry",
+        "linkText": "Inquire Now"
+      },
+      "footer": {
+        "summary": "Engineering high-performance websites, custom web applications, mobile platforms, and enterprise automation software designed to scale organizations.",
+        "copyrightText": "© 2026 TesfayeTech Solutions. All rights reserved. Professional software engineering and digital transformation.",
+        "showTrustBadges": true
+      }
+    },
+    "navigation": {
+      "items": [
+        {
+          "id": "nav-home",
+          "label": "Home",
+          "tab": "home",
+          "visible": true,
+          "order": 1
+        },
+        {
+          "id": "nav-websites",
+          "label": "Website Design",
+          "tab": "websites",
+          "visible": true,
+          "order": 2
+        },
+        {
+          "id": "nav-mobile",
+          "label": "Mobile Apps",
+          "tab": "mobile",
+          "visible": true,
+          "order": 3
+        },
+        {
+          "id": "nav-webapps",
+          "label": "Web Applications",
+          "tab": "webapps",
+          "visible": true,
+          "order": 4
+        },
+        {
+          "id": "nav-industries",
+          "label": "Industries",
+          "tab": "industries",
+          "visible": true,
+          "order": 5
+        },
+        {
+          "id": "nav-services",
+          "label": "Services",
+          "tab": "services",
+          "visible": true,
+          "order": 6
+        },
+        {
+          "id": "nav-about",
+          "label": "About Us",
+          "tab": "about",
+          "visible": true,
+          "order": 7
+        },
+        {
+          "id": "nav-contact",
+          "label": "Contact",
+          "tab": "contact",
+          "visible": true,
+          "order": 8
+        }
+      ],
+      "ctaButtonText": "Request a Project",
+      "ctaDestination": "inquiry"
+    },
+    "theme": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a",
+      "accentColor": "#10b981",
+      "mode": "light",
+      "fontFamily": "plus_jakarta",
+      "buttonStyle": "rounded-xl"
+    },
+    "home": {
+      "sectionVisibility": {
+        "hero": true,
+        "metrics": true,
+        "categories": true,
+        "featuredDemos": true,
+        "process": true,
+        "whyUs": true,
+        "testimonials": true,
+        "faq": true,
+        "contactCta": true
+      },
+      "hero": {
+        "headline": "We Design and Build Digital Solutions for Your Business.",
+        "subtitle": "TesfayeTech engineers production-grade website design, native and cross-platform mobile apps, enterprise web applications, and intelligent business automation systems that accelerate growth.",
+        "badgeText": "Custom Software & Digital Product Studio",
+        "primaryCtaText": "Explore Our Demos",
+        "primaryCtaTab": "webapps",
+        "secondaryCtaText": "Start Your Project",
+        "secondaryCtaTab": "inquiry",
+        "imageUrl": "/src/assets/images/hero_tech_agency_1793079157707.jpg",
+        "imageCaption": "Software Architecture & Engineering · High-Throughput Cloud Deployment"
+      },
+      "metrics": [
+        {
+          "id": "m-1",
+          "value": "18+",
+          "label": "Industry Sectors Engineered",
+          "subtext": "Proven custom domain models"
+        },
+        {
+          "id": "m-2",
+          "value": "3-5x",
+          "label": "Accelerated Time-to-Market",
+          "subtext": "Modular enterprise architecture"
+        },
+        {
+          "id": "m-3",
+          "value": "99.9%",
+          "label": "Uptime SLA & Cloud Reliability",
+          "subtext": "High-availability infrastructure"
+        },
+        {
+          "id": "m-4",
+          "value": "100%",
+          "label": "Source Code & IP Ownership",
+          "subtext": "Zero platform lock-in"
+        }
+      ],
+      "categoriesSection": {
+        "kicker": "Core Expertise",
+        "title": "Specialized Software Solutions",
+        "description": "Choose from our three foundational delivery disciplines or combine them into a unified omnichannel digital platform."
+      },
+      "featuredDemosSection": {
+        "kicker": "Demo Marketplace",
+        "title": "Featured Solution Prototypes",
+        "description": "Interact directly with sample enterprise systems, test live interfaces, and see how our architectures solve real business bottlenecks.",
+        "maxDisplay": 6
+      },
+      "processSection": {
+        "kicker": "Proven Methodology",
+        "title": "From Concept to Turnkey Production",
+        "description": "We employ a disciplined 6-stage engineering lifecycle that ensures transparency, predictable delivery, and zero unexpected downtime.",
+        "steps": [
+          {
+            "id": "ps-1",
+            "num": "01",
+            "title": "Discover",
+            "desc": "Deep-dive feasibility workshops to analyze user workflows, business logic, system boundaries, and return on investment."
+          },
+          {
+            "id": "ps-2",
+            "num": "02",
+            "title": "Design",
+            "desc": "High-fidelity wireframes, interactive design systems, and responsive component libraries tailored for your target audience."
+          },
+          {
+            "id": "ps-3",
+            "num": "03",
+            "title": "Develop",
+            "desc": "Modern full-stack TypeScript engineering with modular microservices, clean API contracts, and robust database architecture."
+          },
+          {
+            "id": "ps-4",
+            "num": "04",
+            "title": "Test",
+            "desc": "Automated integration suites, cross-device QA, load testing, security audits, and WCAG AA accessibility verification."
+          },
+          {
+            "id": "ps-5",
+            "num": "05",
+            "title": "Deploy",
+            "desc": "Automated CI/CD pipelines, containerized cloud infrastructure, SSL certificate provisioning, and zero-downtime rollouts."
+          },
+          {
+            "id": "ps-6",
+            "num": "06",
+            "title": "Support",
+            "desc": "Proactive SLA maintenance, security patch management, performance monitoring, and iterative feature enhancements."
+          }
+        ]
+      },
+      "whyUsSection": {
+        "kicker": "The TesfayeTech Standard",
+        "title": "Why Forward-Thinking Businesses Partner With Us",
+        "description": "We don't build generic cookie-cutter websites or unmaintainable prototypes. We architect scalable, secure software that becomes an enterprise asset for your business.",
+        "points": [
+          {
+            "id": "wp-1",
+            "num": "01",
+            "title": "Direct Domain Experience",
+            "desc": "Pre-built frameworks for banking, logistics, hospitality, clinic management, and retail point of sale."
+          },
+          {
+            "id": "wp-2",
+            "num": "02",
+            "title": "Modern Code Quality & Security",
+            "desc": "Strict TypeScript type safety, automated tests, role-based access control, and GDPR/data privacy standards."
+          },
+          {
+            "id": "wp-3",
+            "num": "03",
+            "title": "Complete IP & Code Ownership",
+            "desc": "No proprietary platform lock-in. You receive 100% full rights to your git repository, database schemas, and assets."
+          }
+        ]
+      },
+      "testimonialsSection": {
+        "kicker": "Illustrative Case Studies",
+        "title": "Simulated Client Impact Outcomes",
+        "description": "Sample illustrative benchmarks based on standardized deployment metrics.",
+        "items": [
+          {
+            "id": "test-1",
+            "quote": "Transitioning our 4 polyclinic branches to the unified mobile appointment and SMS queue system eliminated morning crowding and slashed patient no-shows in the first 90 days.",
+            "author": "Dr. S. Bekele",
+            "role": "Polyclinic Medical Director",
+            "company": "MediConnect Health Polyclinics",
+            "metric": "-45% Patient Wait Time",
+            "isSample": true,
+            "published": true
+          },
+          {
+            "id": "test-2",
+            "quote": "Offline transaction queueing allowed our retail cashiers to ring up customers seamlessly during network dropouts without losing a single transaction or inventory sync record.",
+            "author": "Dawit Mengistu",
+            "role": "VP of Retail Operations",
+            "company": "Apex Mart Chain",
+            "metric": "+38% Faster Lane Checkout",
+            "isSample": true,
+            "published": true
+          }
+        ]
+      },
+      "faqSection": {
+        "kicker": "Common Questions",
+        "title": "Frequently Asked Questions",
+        "description": "Everything you need to know about our engineering approach, delivery model, and contracts.",
+        "faqs": [
+          {
+            "id": "faq-1",
+            "q": "How quickly will TesfayeTech respond to my project inquiry?",
+            "a": "A dedicated solutions architect reviews your requirements and responds with preliminary feedback and architectural assessment within 24 business hours.",
+            "published": true
+          },
+          {
+            "id": "faq-2",
+            "q": "Who owns the intellectual property and code upon project completion?",
+            "a": "You own 100% of all intellectual property, source code repositories, databases, design assets, and deployment keys upon final milestone payment. No hidden licensing fees.",
+            "published": true
+          },
+          {
+            "id": "faq-3",
+            "q": "Can we test an interactive prototype before committing to full production?",
+            "a": "Yes. We frequently develop rapid click-through prototypes or interactive sandbox environments so stakeholders can validate user workflows early.",
+            "published": true
+          },
+          {
+            "id": "faq-4",
+            "q": "Do you provide ongoing support and SLA maintenance after deployment?",
+            "a": "Yes. Every project includes a 30-day warranty against bugs, followed by optional monthly SLA maintenance plans covering security patches, backups, and feature iterations.",
+            "published": true
+          }
+        ]
+      },
+      "contactBanner": {
+        "kicker": "Start Your Engineering Journey",
+        "headline": "Have a Specific Project in Mind? Let's Architect It Together.",
+        "description": "Submit your requirements to receive a complimentary feasibility analysis, technology stack recommendation, and estimated development timeline within 24 hours.",
+        "primaryButtonText": "Request Project Consultation",
+        "secondaryButtonText": "Speak With an Architect"
+      }
+    },
+    "services": [
+      {
+        "id": "srv-1",
+        "title": "Website Design and Development",
+        "slug": "website-design",
+        "iconName": "Globe",
+        "shortDescription": "High-speed corporate portals, consulting websites, e-commerce stores, and responsive web experiences built for high conversion.",
+        "fullDescription": "Custom, responsive websites built with modern front-end frameworks, high-speed architectures, and structured SEO for high business conversion.",
+        "benefits": [
+          "Sub-second page load performance and Google Core Web Vitals optimization",
+          "Intuitive CMS integration for non-technical team updates",
+          "Accessible WCAG AA standards ensuring compliance and universal access"
+        ],
+        "deliverables": [
+          "Production website code repository",
+          "Custom interactive component library",
+          "SEO schema metadata and sitemap setup",
+          "CMS administrative training guide"
+        ],
+        "quoteCtaText": "Request a Quote for Website Design",
+        "order": 1,
+        "published": true
+      },
+      {
+        "id": "srv-2",
+        "title": "Responsive UI/UX Design",
+        "slug": "ui-ux-design",
+        "iconName": "Layout",
+        "shortDescription": "Human-centered user interface architecture and user experience research focused on minimizing friction and driving user conversion.",
+        "fullDescription": "Human-centered user interface architecture and user experience research focused on minimizing user friction, reducing drop-offs, and driving task completion.",
+        "benefits": [
+          "Interactive Figma prototypes tested with target user personas",
+          "Comprehensive design tokens, typography scales, and color systems",
+          "Cross-platform responsive layouts across mobile, tablet, and ultra-wide screens"
+        ],
+        "deliverables": [
+          "Figma high-fidelity interactive prototype",
+          "Component design system & token specifications",
+          "User journey flowcharts and wireframe wireframes",
+          "Production asset export package"
+        ],
+        "quoteCtaText": "Request a Quote for UI/UX Design",
+        "order": 2,
+        "published": true
+      },
+      {
+        "id": "srv-3",
+        "title": "Android and iOS Application Development",
+        "slug": "mobile-development",
+        "iconName": "Smartphone",
+        "shortDescription": "Native iOS and Android mobile apps featuring biometrics, real-time push messaging, background sync, and offline resilience.",
+        "fullDescription": "Native and high-performance cross-platform mobile apps for iOS and Android featuring biometrics, real-time push messaging, and offline storage.",
+        "benefits": [
+          "Frictionless performance with 60fps smooth animations",
+          "Reliable offline data caching with background sync",
+          "Seamless integration with native camera, GPS, and device biometrics"
+        ],
+        "deliverables": [
+          "iOS (App Store) and Android (Google Play) release builds",
+          "Full mobile application source code",
+          "Push notification server integration",
+          "Store submission and approval management"
+        ],
+        "quoteCtaText": "Request a Quote for Mobile Apps",
+        "order": 3,
+        "published": true
+      },
+      {
+        "id": "srv-4",
+        "title": "Custom Web Application Development",
+        "slug": "custom-web-apps",
+        "iconName": "Code2",
+        "shortDescription": "Enterprise full-stack web applications with complex workflows, role-based security, stateful sessions, and high data concurrency.",
+        "fullDescription": "Full-stack enterprise web applications with complex business logic, role-based security, stateful user sessions, and real-time data flows.",
+        "benefits": [
+          "Tailored exactly to your operational logic rather than rigid SaaS templates",
+          "Zero per-seat licensing fees for internal employees",
+          "High-concurrency data throughput and instant UI responsiveness"
+        ],
+        "deliverables": [
+          "Full-stack TypeScript codebase",
+          "Automated unit and integration test suites",
+          "REST / GraphQL API specifications",
+          "Comprehensive technical architecture documentation"
+        ],
+        "quoteCtaText": "Request a Quote for Web Apps",
+        "order": 4,
+        "published": true
+      },
+      {
+        "id": "srv-5",
+        "title": "Business Management Software & Automation",
+        "slug": "business-automation",
+        "iconName": "Cpu",
+        "shortDescription": "Custom ERP, HRMS, CRM, Point of Sale, and inventory systems engineered to automate clerical tasks and eliminate departmental silos.",
+        "fullDescription": "Custom ERP, HRMS, CRM, Point of Sale, and inventory systems engineered to automate manual clerical tasks, calculate payroll, and eliminate data silos.",
+        "benefits": [
+          "Save up to 30 hours per week in redundant manual spreadsheet entry",
+          "Unified single source of truth across departments and branches",
+          "Real-time executive KPI dashboards with actionable metrics"
+        ],
+        "deliverables": [
+          "Centralized business operations dashboard",
+          "Automated reporting and PDF generator modules",
+          "Multi-tiered role-based access management",
+          "Legacy data import and schema migration scripts"
+        ],
+        "quoteCtaText": "Request a Quote for Business Software",
+        "order": 5,
+        "published": true
+      },
+      {
+        "id": "srv-6",
+        "title": "API and Third-Party Integrations",
+        "slug": "api-integrations",
+        "iconName": "Share2",
+        "shortDescription": "Secure integration with payment gateways (Stripe, Telebirr, CBE Birr), ERPs, CRM systems, SMS gateways, and cloud webhooks.",
+        "fullDescription": "Seamless integration with payment gateways, ERPs, CRM systems, SMS gateways, and cloud webhooks.",
+        "benefits": [
+          "Secure token-based authentication and rate-limiting safeguards",
+          "Resilient webhook listeners with automated retry mechanisms",
+          "Two-way real-time data synchronization between external platforms"
+        ],
+        "deliverables": [
+          "Production webhook processing microservices",
+          "Payment gateway checkout workflows",
+          "Third-party ERP/CRM sync connectors",
+          "API error logging and monitor alerting"
+        ],
+        "quoteCtaText": "Request a Quote for API Integrations",
+        "order": 6,
+        "published": true
+      },
+      {
+        "id": "srv-7",
+        "title": "Database Design and Implementation",
+        "slug": "database-design",
+        "iconName": "Database",
+        "shortDescription": "Normalized relational schemas and document stores designed for ACID compliance, fast indexing, and zero data corruption.",
+        "fullDescription": "Normalized relational schemas (PostgreSQL, MySQL) and scalable document stores (MongoDB, Firestore) designed for ACID compliance, speed, and integrity.",
+        "benefits": [
+          "Optimal indexing strategies preventing query bottlenecks as data scales",
+          "Rock-solid referential integrity and transaction rollbacks",
+          "Automated snapshot backups and point-in-time disaster recovery"
+        ],
+        "deliverables": [
+          "Entity Relationship Diagrams (ERD) & schema migrations",
+          "Automated database backup scripts",
+          "Query optimization and indexing plan",
+          "Data sanitization and privacy masking protocols"
+        ],
+        "quoteCtaText": "Request a Quote for Database Design",
+        "order": 7,
+        "published": true
+      },
+      {
+        "id": "srv-8",
+        "title": "Cloud Deployment and Hosting Infrastructure",
+        "slug": "cloud-hosting",
+        "iconName": "Cloud",
+        "shortDescription": "Containerized deployments on Google Cloud, AWS, or Azure with auto-scaling, load balancing, SSL, and automated CI/CD pipelines.",
+        "fullDescription": "Containerized deployments (Docker, Kubernetes) on Google Cloud Platform, AWS, or Azure with auto-scaling, load balancing, and CDN caching.",
+        "benefits": [
+          "Zero-downtime rolling deployments via automated CI/CD pipelines",
+          "Elastic scaling that dynamically accommodates traffic spikes",
+          "Encrypted environment variable vault keeping keys safe"
+        ],
+        "deliverables": [
+          "Infrastructure-as-Code (IaC) configuration scripts",
+          "CI/CD GitHub Actions or GitLab pipeline setup",
+          "SSL certificate provisioning and domain routing",
+          "Cloud cost optimization audit"
+        ],
+        "quoteCtaText": "Request a Quote for Cloud Deployment",
+        "order": 8,
+        "published": true
+      },
+      {
+        "id": "srv-9",
+        "title": "Maintenance, Security, and Technical Support",
+        "slug": "maintenance-support",
+        "iconName": "ShieldCheck",
+        "shortDescription": "Continuous system health monitoring, vulnerability patching, automated backups, and guaranteed SLA response times.",
+        "fullDescription": "Ongoing software maintenance, proactive security patches, uptime monitoring, and priority technical assistance under guaranteed SLAs.",
+        "benefits": [
+          "Guaranteed response times with dedicated engineering lead",
+          "Proactive vulnerability scanning and dependency patching",
+          "Monthly performance optimization and feature iteration support"
+        ],
+        "deliverables": [
+          "Monthly uptime and health reports",
+          "Scheduled security and dependency updates",
+          "Priority bug remediation ticket access",
+          "Quarterly architecture review and roadmap planning"
+        ],
+        "quoteCtaText": "Request a Quote for SLA Support",
+        "order": 9,
+        "published": true
+      }
+    ],
+    "industries": [
+      {
+        "id": "ind-1",
+        "name": "Banking and Financial Services",
+        "slug": "banking-and-financial-services",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Banking and Financial Services.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 1
+      },
+      {
+        "id": "ind-2",
+        "name": "Insurance and Reinsurance",
+        "slug": "insurance-and-reinsurance",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Insurance and Reinsurance.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 2
+      },
+      {
+        "id": "ind-3",
+        "name": "Healthcare and Pharmaceuticals",
+        "slug": "healthcare-and-pharmaceuticals",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Healthcare and Pharmaceuticals.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 3
+      },
+      {
+        "id": "ind-4",
+        "name": "Education and Training",
+        "slug": "education-and-training",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Education and Training.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 4
+      },
+      {
+        "id": "ind-5",
+        "name": "Retail and E-commerce",
+        "slug": "retail-and-e-commerce",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Retail and E-commerce.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 5
+      },
+      {
+        "id": "ind-6",
+        "name": "Manufacturing and Distribution",
+        "slug": "manufacturing-and-distribution",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Manufacturing and Distribution.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 6
+      },
+      {
+        "id": "ind-7",
+        "name": "Hospitality, Hotels and Tourism",
+        "slug": "hospitality-hotels-and-tourism",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Hospitality, Hotels and Tourism.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 7
+      },
+      {
+        "id": "ind-8",
+        "name": "Real Estate and Construction",
+        "slug": "real-estate-and-construction",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Real Estate and Construction.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 8
+      },
+      {
+        "id": "ind-9",
+        "name": "Transportation and Logistics",
+        "slug": "transportation-and-logistics",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Transportation and Logistics.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 9
+      },
+      {
+        "id": "ind-10",
+        "name": "Agriculture and Agribusiness",
+        "slug": "agriculture-and-agribusiness",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Agriculture and Agribusiness.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 10
+      },
+      {
+        "id": "ind-11",
+        "name": "NGOs and Development Organizations",
+        "slug": "ngos-and-development-organizations",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for NGOs and Development Organizations.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 11
+      },
+      {
+        "id": "ind-12",
+        "name": "Government and Public Services",
+        "slug": "government-and-public-services",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Government and Public Services.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 12
+      },
+      {
+        "id": "ind-13",
+        "name": "Professional and Consulting Services",
+        "slug": "professional-and-consulting-services",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Professional and Consulting Services.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 13
+      },
+      {
+        "id": "ind-14",
+        "name": "Telecommunications and Technology",
+        "slug": "telecommunications-and-technology",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Telecommunications and Technology.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 14
+      },
+      {
+        "id": "ind-15",
+        "name": "Human Resources and Recruitment",
+        "slug": "human-resources-and-recruitment",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Human Resources and Recruitment.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 15
+      },
+      {
+        "id": "ind-16",
+        "name": "Media and Entertainment",
+        "slug": "media-and-entertainment",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Media and Entertainment.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 16
+      },
+      {
+        "id": "ind-17",
+        "name": "Restaurants and Food Services",
+        "slug": "restaurants-and-food-services",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Restaurants and Food Services.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 17
+      },
+      {
+        "id": "ind-18",
+        "name": "Legal and Business Services",
+        "slug": "legal-and-business-services",
+        "description": "Tailored digital architecture, automated operational workflows, and specialized transaction logic for Legal and Business Services.",
+        "iconName": "Building2",
+        "published": true,
+        "order": 18
+      }
+    ],
+    "customPages": [
+      {
+        "id": "page-privacy",
+        "title": "Privacy Policy",
+        "slug": "privacy-policy",
+        "content": "## Privacy Policy for TesfayeTech\n\nAt TesfayeTech, we recognize that privacy is critical when developing bespoke software systems and processing confidential enterprise data.\n\n### 1. Data Collection & Usage\nWe only collect project specifications, contact information, and business requirements voluntarily submitted through our inquiry forms or during architecture discovery meetings.\n\n### 2. Client Confidentiality & Non-Disclosure\nAll proprietary workflows, source code, data schemas, and client business logic are treated under strict Non-Disclosure Agreements (NDAs). We never disclose, monetize, or repurpose proprietary client algorithms.\n\n### 3. Source Code Ownership\nClients retain 100% intellectual property ownership of all custom software repositories, deployment configurations, and data stores created specifically for their engagement upon project completion.",
+        "seoTitle": "Privacy Policy | TesfayeTech Software Solutions",
+        "seoDescription": "Review TesfayeTech client confidentiality, non-disclosure protocols, and intellectual property ownership policies.",
+        "published": true,
+        "showInFooter": true,
+        "updatedAt": "2026-10-20T00:00:00Z"
+      },
+      {
+        "id": "page-terms",
+        "title": "Terms of Service",
+        "slug": "terms-of-service",
+        "content": "## Terms of Service & Software Development Engagement\n\n### 1. Scope & Deliverables\nAll software engineering, UI/UX design, and deployment projects are governed by detailed Statements of Work (SOW) specifying milestones, acceptance criteria, and delivery timelines.\n\n### 2. Warranty Period\nEvery delivered project includes a complimentary 30-day post-launch warranty covering defect remediation and configuration adjustments at zero additional fee.\n\n### 3. Payment Milestones\nEngagements follow structured milestone billing (e.g. Discovery & Design Approval, Core Development Complete, Final UAT & Production Cutover).",
+        "seoTitle": "Terms of Service | TesfayeTech",
+        "seoDescription": "Read the terms governing software development contracts, milestone deliverables, and warranties at TesfayeTech.",
+        "published": true,
+        "showInFooter": true,
+        "updatedAt": "2026-10-20T00:00:00Z"
+      }
+    ],
+    "contactForm": {
+      "fields": {
+        "fullName": {
+          "label": "Full Name",
+          "required": true
+        },
+        "companyName": {
+          "label": "Company / Organization",
+          "required": false
+        },
+        "email": {
+          "label": "Email Address",
+          "required": true
+        },
+        "phone": {
+          "label": "Phone / WhatsApp Number",
+          "required": false
+        },
+        "country": {
+          "label": "Country",
+          "required": false
+        },
+        "solutionType": {
+          "label": "Solution Category",
+          "required": true
+        },
+        "industry": {
+          "label": "Business Industry",
+          "required": true
+        },
+        "projectDescription": {
+          "label": "Project Description & Objectives",
+          "required": true
+        },
+        "requiredFeatures": {
+          "label": "Requested Features or Integrations",
+          "required": false
+        },
+        "budgetRange": {
+          "label": "Target Budget Range",
+          "required": false
+        },
+        "expectedDate": {
+          "label": "Target Completion Date",
+          "required": false
+        }
+      },
+      "solutionOptions": [
+        "Website Design",
+        "Mobile Application Development",
+        "Web Application Development",
+        "Business Automation Systems",
+        "UI/UX Product Design"
+      ],
+      "budgetOptions": [
+        "$3,000 - $7,000 (Standard Website / Small MVP)",
+        "$7,000 - $15,000 (Commercial Web / Mobile App)",
+        "$15,000 - $35,000 (Enterprise Portal / Multi-platform)",
+        "$35,000+ (Full Custom ERP / Large Scale)",
+        "Flexible / Needs Estimation"
+      ],
+      "contactMethods": [
+        "Email",
+        "Phone",
+        "WhatsApp",
+        "Video Call"
+      ],
+      "confirmationMessage": "Your project inquiry has been received. Our solutions team will review and contact you within 24 business hours.",
+      "privacyConsentText": "By submitting this inquiry, you agree to our privacy policy and consent to confidential correspondence from our engineering team.",
+      "notificationEmail": "inquiries@tesfayetech.com"
+    },
+    "seo": {
+      "defaultTitle": "TesfayeTech | Software & Digital Solutions Marketplace",
+      "titleTemplate": "%s | TesfayeTech",
+      "metaDescription": "Professional software development portfolio and demo marketplace for TesfayeTech, featuring websites, mobile apps, web applications, enterprise systems, and client inquiry management.",
+      "keywords": "software development, website design, mobile apps, web applications, ERP, HRMS, Ethiopia, Africa, tech portfolio, digital transformation",
+      "ogImage": "/src/assets/images/hero_tech_agency_1793079157707.jpg",
+      "canonicalUrl": "https://tesfayetech.com"
+    }
+  },
+  "adminAccount": {
+    "email": "contactesfaye@gmail.com",
+    "passwordHash": "f8f7976c618123dd46a5b049d19c7e921650c8a2319a6d37e744c3f81c6fa27d",
+    "salt": "ba285a37b33e525c5059015ff7387a59",
+    "isEmailVerified": true,
+    "failedLoginAttempts": 0,
+    "lockoutUntil": null
+  }
+}
