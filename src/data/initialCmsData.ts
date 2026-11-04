@@ -1,5 +1,6 @@
 import { CmsConfig } from '../types/cms';
 import { INDUSTRIES_LIST } from './seedData';
+import { DEFAULT_SEO_PAGES, DEFAULT_BLOG_ARTICLES } from './seoAndBlogData';
 
 export const DEFAULT_CMS_CONFIG: CmsConfig = {
   version: 1,
@@ -42,10 +43,9 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
       { id: 'nav-websites', label: 'Website Design', tab: 'websites', visible: true, order: 2 },
       { id: 'nav-mobile', label: 'Mobile Apps', tab: 'mobile', visible: true, order: 3 },
       { id: 'nav-webapps', label: 'Web Applications', tab: 'webapps', visible: true, order: 4 },
-      { id: 'nav-industries', label: 'Industries', tab: 'industries', visible: true, order: 5 },
-      { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 6 },
-      { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 7 },
-      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 8 }
+      { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 5 },
+      { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 6 },
+      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 7 }
     ],
     ctaButtonText: 'Request a Project',
     ctaDestination: 'inquiry'
@@ -481,11 +481,17 @@ Engagements follow structured milestone billing (e.g. Discovery & Design Approva
   },
 
   seo: {
-    defaultTitle: 'TesfayeTech | Software & Digital Solutions Marketplace',
-    titleTemplate: '%s | TesfayeTech',
-    metaDescription: 'Professional software development portfolio and demo marketplace for TesfayeTech, featuring websites, mobile apps, web applications, enterprise systems, and client inquiry management.',
-    keywords: 'software development, website design, mobile apps, web applications, ERP, HRMS, Ethiopia, Africa, tech portfolio, digital transformation',
-    ogImage: '/src/assets/images/hero_tech_agency_1793079157707.jpg',
-    canonicalUrl: 'https://tesfayetech.com'
-  }
+    defaultTitle: "TesfayeTech | Premier Software Development & Digital Solutions Company in Ethiopia",
+    titleTemplate: "%s | TesfayeTech",
+    metaDescription: "Top-tier software development company in Addis Ababa, Ethiopia. We engineer custom enterprise ERP software, high-converting websites, mobile apps, and cloud web applications.",
+    keywords: "Web Development Company in Ethiopia, Custom Software Development Addis Ababa, Mobile App Development Ethiopia, Enterprise ERP Solutions Addis Ababa, UI/UX Design Agency Ethiopia, Software Company Addis Ababa, Bole Innovation District, Telebirr integration",
+    ogImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+    canonicalUrl: "https://tesfayeteklu.com",
+    robots: "index, follow",
+    googleSearchConsoleVerification: "google-site-verification=tesfayetech-search-console-verification-token",
+    bingVerification: "msvalidate.01=tesfayetech-bing-verification-token",
+    googleAnalyticsId: "G-TESFAYETECH",
+    pages: DEFAULT_SEO_PAGES
+  },
+  blogArticles: DEFAULT_BLOG_ARTICLES
 };

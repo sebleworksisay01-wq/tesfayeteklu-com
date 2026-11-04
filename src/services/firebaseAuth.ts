@@ -26,7 +26,6 @@ export interface AdminAuthState {
   adminUser: AdminUser | null;
   isAuthenticatedAdmin: boolean;
   isEmailVerified: boolean;
-  hasAdminClaim: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -112,15 +111,6 @@ export async function loginWithFirebase(
     }
     throw new Error(
       `Email verification required. A verification link has been sent to ${AUTHORIZED_ADMIN_EMAIL}. Please verify your email before accessing the dashboard.`
-    );
-  }
-
-  // Force token refresh from server to capture newly assigned custom claims
-  const tokenResult = await refreshedUser.getIdTokenResult(true);
-  const hasAdminClaim = Boolean(tokenResult.claims.admin === true);
-  if (!hasAdminClaim) {
-    console.warn(
-      `[ADMIN CLAIM NOTICE] Account ${AUTHORIZED_ADMIN_EMAIL} is verified, but custom claim { admin: true } is not yet active on token. If administrative writes fail, run: npm run set-admin-claim`
     );
   }
 
@@ -229,7 +219,6 @@ export function subscribeToAuthState(
         adminUser: null,
         isAuthenticatedAdmin: false,
         isEmailVerified: false,
-        hasAdminClaim: false,
         loading: false,
         error: null,
       });
@@ -237,14 +226,6 @@ export function subscribeToAuthState(
     }
 
     const isVerified = Boolean(user.emailVerified);
-    let hasAdminClaim = false;
-    try {
-      const idTokenResult = await user.getIdTokenResult();
-      hasAdminClaim = Boolean(idTokenResult.claims.admin === true);
-    } catch {
-      hasAdminClaim = false;
-    }
-
     const adminUser = mapFirebaseUserToAdmin(user);
     const isAuthAdmin = Boolean(adminUser && isVerified);
 
@@ -253,7 +234,6 @@ export function subscribeToAuthState(
       adminUser,
       isAuthenticatedAdmin: isAuthAdmin,
       isEmailVerified: isVerified,
-      hasAdminClaim,
       loading: false,
       error: !isVerified
         ? `Account email is unverified. Please check ${user.email} to verify access.`

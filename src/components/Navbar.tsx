@@ -35,17 +35,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navItems = (navigation?.items || [
+  const baseItems = navigation?.items ? [...navigation.items] : [
     { id: 'nav-home', label: 'Home', tab: 'home', visible: true, order: 1 },
     { id: 'nav-websites', label: 'Website Design', tab: 'websites', visible: true, order: 2 },
     { id: 'nav-mobile', label: 'Mobile Apps', tab: 'mobile', visible: true, order: 3 },
     { id: 'nav-webapps', label: 'Web Applications', tab: 'webapps', visible: true, order: 4 },
-    { id: 'nav-industries', label: 'Industries', tab: 'industries', visible: true, order: 5 },
-    { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 6 },
-    { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 7 },
-    { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 8 }
-  ])
-    .filter((item) => item.visible !== false)
+    { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 5 },
+    { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 6 },
+    { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 7 }
+  ];
+
+  if (!baseItems.some((i) => i.tab === 'blog')) {
+    baseItems.push({ id: 'nav-blog', label: 'Blog', tab: 'blog', visible: true, order: 8 });
+  }
+
+  const navItems = baseItems
+    .filter((item) => item.visible !== false && item.tab !== 'industries')
     .sort((a, b) => a.order - b.order);
 
   const companyName = identity?.companyName || 'TesfayeTech';

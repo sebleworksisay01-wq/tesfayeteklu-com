@@ -18,14 +18,43 @@ import { ServicesView } from './views/ServicesView';
 import { AboutView } from './views/AboutView';
 import { ContactView } from './views/ContactView';
 import { CustomPageView } from './views/CustomPageView';
+import { BlogView } from './views/BlogView';
+import { BlogPostView } from './views/BlogPostView';
+import { NotFoundView } from './views/NotFoundView';
+import { SEOHead } from './components/SEOHead';
 import { InquiryModal } from './components/InquiryModal';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { InteractiveSimulatorModal } from './components/InteractiveSimulators';
 import { AdminCMS } from './components/AdminCMS/AdminCMS';
 import { AdminLoginPage } from './views/AdminLoginPage';
+import { BlogArticle } from './types/cms';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<string>('home');
+  // Helper to parse path into tab and slugs
+  const parsePath = (path: string) => {
+    if (path === '/' || path === '') return { tab: 'home', blogSlug: null, pageSlug: null };
+    if (path === '/blog' || path === '/blog/') return { tab: 'blog', blogSlug: null, pageSlug: null };
+    if (path.startsWith('/blog/')) {
+      const slug = path.replace('/blog/', '').split('/')[0];
+      return { tab: 'blog-post', blogSlug: slug, pageSlug: null };
+    }
+    if (path.startsWith('/page/')) {
+      const slug = path.replace('/page/', '').split('/')[0];
+      return { tab: 'custom-page', blogSlug: null, pageSlug: slug };
+    }
+    if (path === '/about' || path === '/about/') return { tab: 'about', blogSlug: null, pageSlug: null };
+    if (path === '/services' || path === '/services/') return { tab: 'services', blogSlug: null, pageSlug: null };
+    if (path === '/services/website-design' || path === '/websites') return { tab: 'websites', blogSlug: null, pageSlug: null };
+    if (path === '/services/mobile-apps' || path === '/mobile') return { tab: 'mobile', blogSlug: null, pageSlug: null };
+    if (path === '/services/web-applications' || path === '/webapps') return { tab: 'webapps', blogSlug: null, pageSlug: null };
+    if (path === '/portfolio' || path === '/portfolio/') return { tab: 'webapps', blogSlug: null, pageSlug: null };
+    if (path === '/contact' || path === '/contact/') return { tab: 'contact', blogSlug: null, pageSlug: null };
+    if (path.startsWith('/admin')) return { tab: 'admin', blogSlug: null, pageSlug: null };
+    return { tab: 'not-found', blogSlug: null, pageSlug: null };
+  };
+
+  const initialRoute = parsePath(window.location.pathname);
+  const [currentTab, setCurrentTab] = useState<string>(initialRoute.tab);
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [cms, setCms] = useState<CmsConfig>(DEFAULT_CMS_CONFIG);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,8 +64,9 @@ export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => Boolean(getAuthToken()));
   const [authChecking, setAuthChecking] = useState<boolean>(true);
 
-  // Custom page slug state when viewing a CMS legal/custom page
-  const [activeCustomPageSlug, setActiveCustomPageSlug] = useState<string | null>(null);
+  // Slugs for dynamic routes
+  const [activeCustomPageSlug, setActiveCustomPageSlug] = useState<string | null>(initialRoute.pageSlug);
+  const [activeBlogSlug, setActiveBlogSlug] = useState<string | null>(initialRoute.blogSlug);
 
   // Modals state
   const [inquiryModalOpen, setInquiryModalOpen] = useState<boolean>(false);
@@ -62,12 +92,10 @@ export default function App() {
     const handlePopState = () => {
       const path = window.location.pathname;
       setCurrentPath(path);
-
-      if (path.startsWith('/page/')) {
-        const slug = path.replace('/page/', '');
-        setActiveCustomPageSlug(slug);
-        setCurrentTab('custom-page');
-      }
+      const parsed = parsePath(path);
+      setCurrentTab(parsed.tab);
+      setActiveBlogSlug(parsed.blogSlug);
+      setActiveCustomPageSlug(parsed.pageSlug);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -127,9 +155,39 @@ export default function App() {
     setCurrentPath('/');
   };
 
+  const getRoutePath = (tab: string, blogSlug?: string | null, pageSlug?: string | null) => {
+    switch (tab) {
+      case 'home': return '/';
+      case 'websites': return '/services/website-design';
+      case 'mobile': return '/services/mobile-apps';
+      case 'webapps': return '/services/web-applications';
+      case 'services': return '/services';
+      case 'about': return '/about';
+      case 'contact': return '/contact';
+      case 'blog': return '/blog';
+      case 'blog-post': return blogSlug ? `/blog/${blogSlug}` : '/blog';
+      case 'portfolio': return '/portfolio';
+      case 'custom-page': return pageSlug ? `/page/${pageSlug}` : '/';
+      default: return '/';
+    }
+  };
+
   const handleSelectTab = (tab: string) => {
     setActiveCustomPageSlug(null);
+    setActiveBlogSlug(null);
     setCurrentTab(tab);
+    const targetPath = getRoutePath(tab);
+    window.history.pushState({}, '', targetPath);
+    setCurrentPath(targetPath);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectArticle = (article: BlogArticle) => {
+    setActiveBlogSlug(article.slug);
+    setCurrentTab('blog-post');
+    const targetPath = `/blog/${article.slug}`;
+    window.history.pushState({}, '', targetPath);
+    setCurrentPath(targetPath);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -234,6 +292,8 @@ export default function App() {
   }
 
   const activeCustomPage = (cms?.customPages || []).find((p) => p.slug === activeCustomPageSlug);
+  const activeArticle = (cms?.blogArticles || []).find((a) => a.slug === activeBlogSlug);
+  const getPageConfig = (pageId: string) => (cms?.seo?.pages || []).find((p) => p.id === pageId);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
@@ -267,93 +327,203 @@ export default function App() {
       {/* Main Dynamic View Content */}
       <main className="flex-1 pb-16">
         {currentTab === 'home' && (
-          <HomeView
-            projects={projects}
-            cms={cms}
-            onSelectTab={handleSelectTab}
-            onRequestProject={handleOpenGeneralInquiry}
-            onViewDetails={(proj) => setSelectedProjectDetail(proj)}
-            onLaunchDemo={(proj) => setSimulatorProject(proj)}
-            onRequestSimilar={handleOpenProjectInquiry}
-          />
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('home')}
+              identity={cms.identity}
+            />
+            <HomeView
+              projects={projects}
+              cms={cms}
+              onSelectTab={handleSelectTab}
+              onRequestProject={handleOpenGeneralInquiry}
+              onViewDetails={(proj) => setSelectedProjectDetail(proj)}
+              onLaunchDemo={(proj) => setSimulatorProject(proj)}
+              onRequestSimilar={handleOpenProjectInquiry}
+            />
+          </>
         )}
 
         {currentTab === 'websites' && (
-          <PortfolioView
-            projects={projects}
-            defaultSolutionType="Website Design"
-            title="Website Design & Digital Experience Portfolio"
-            description="High-converting corporate company profiles, consulting websites, e-commerce storefronts, hotel booking engines, and responsive web portals."
-            onViewDetails={(proj) => setSelectedProjectDetail(proj)}
-            onLaunchDemo={(proj) => setSimulatorProject(proj)}
-            onRequestSimilar={handleOpenProjectInquiry}
-          />
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('websites')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: 'Website Design', url: '/services/website-design' }
+              ]}
+            />
+            <PortfolioView
+              projects={projects}
+              defaultSolutionType="Website Design"
+              title="Website Design & Digital Experience Portfolio"
+              description="High-converting corporate company profiles, consulting websites, e-commerce storefronts, hotel booking engines, and responsive web portals."
+              onViewDetails={(proj) => setSelectedProjectDetail(proj)}
+              onLaunchDemo={(proj) => setSimulatorProject(proj)}
+              onRequestSimilar={handleOpenProjectInquiry}
+            />
+          </>
         )}
 
         {currentTab === 'mobile' && (
-          <PortfolioView
-            projects={projects}
-            defaultSolutionType="Mobile Application Development"
-            title="Mobile Application Development Portfolio"
-            description="Native iOS and Android mobile solutions including banking & payment apps, food ordering, healthcare appointment booking, loyalty platforms, and field logistics."
-            onViewDetails={(proj) => setSelectedProjectDetail(proj)}
-            onLaunchDemo={(proj) => setSimulatorProject(proj)}
-            onRequestSimilar={handleOpenProjectInquiry}
-          />
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('mobile')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: 'Mobile Apps', url: '/services/mobile-apps' }
+              ]}
+            />
+            <PortfolioView
+              projects={projects}
+              defaultSolutionType="Mobile Application Development"
+              title="Mobile Application Development Portfolio"
+              description="Native iOS and Android mobile solutions including banking & payment apps, food ordering, healthcare appointment booking, loyalty platforms, and field logistics."
+              onViewDetails={(proj) => setSelectedProjectDetail(proj)}
+              onLaunchDemo={(proj) => setSimulatorProject(proj)}
+              onRequestSimilar={handleOpenProjectInquiry}
+            />
+          </>
         )}
 
-        {currentTab === 'webapps' && (
-          <PortfolioView
-            projects={projects}
-            defaultSolutionType="All"
-            title="Web Applications, ERP & Systems Marketplace"
-            description="Mission-critical enterprise software, HRMS suites, inventory management systems, Point of Sale (POS) registers, clinic portals, and custom CRM platforms."
-            onViewDetails={(proj) => setSelectedProjectDetail(proj)}
-            onLaunchDemo={(proj) => setSimulatorProject(proj)}
-            onRequestSimilar={handleOpenProjectInquiry}
-          />
+        {(currentTab === 'webapps' || currentTab === 'portfolio') && (
+          <>
+            <SEOHead
+              pageConfig={getPageConfig(currentTab === 'portfolio' ? 'portfolio' : 'webapps')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                {
+                  name: currentTab === 'portfolio' ? 'Portfolio' : 'Web Applications & ERP',
+                  url: currentTab === 'portfolio' ? '/portfolio' : '/services/web-applications'
+                }
+              ]}
+            />
+            <PortfolioView
+              projects={projects}
+              defaultSolutionType="All"
+              title="Web Applications, ERP & Systems Marketplace"
+              description="Mission-critical enterprise software, HRMS suites, inventory management systems, Point of Sale (POS) registers, clinic portals, and custom CRM platforms."
+              onViewDetails={(proj) => setSelectedProjectDetail(proj)}
+              onLaunchDemo={(proj) => setSimulatorProject(proj)}
+              onRequestSimilar={handleOpenProjectInquiry}
+            />
+          </>
         )}
 
         {currentTab === 'industries' && (
           <IndustriesView
             projects={projects}
             industries={cms.industries}
-            onSelectIndustry={(industry) => {
-              setCurrentTab('webapps');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+            onSelectIndustry={() => {
+              handleSelectTab('webapps');
             }}
             onRequestProject={handleOpenGeneralInquiry}
           />
         )}
 
         {currentTab === 'services' && (
-          <ServicesView
-            services={cms.services}
-            onRequestQuoteForService={handleOpenServiceInquiry}
-          />
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('services')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: 'Services', url: '/services' }
+              ]}
+            />
+            <ServicesView
+              services={cms.services}
+              onRequestQuoteForService={handleOpenServiceInquiry}
+            />
+          </>
         )}
 
         {currentTab === 'about' && (
-          <AboutView
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('about')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: 'About Us', url: '/about' }
+              ]}
+            />
+            <AboutView
+              onRequestProject={handleOpenGeneralInquiry}
+            />
+          </>
+        )}
+
+        {currentTab === 'contact' && (
+          <>
+            <SEOHead
+              pageConfig={getPageConfig('contact')}
+              identity={cms.identity}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: 'Contact', url: '/contact' }
+              ]}
+            />
+            <ContactView
+              identity={cms.identity}
+              contactFormConfig={cms.contactForm}
+              faqs={cms.home.faqSection?.faqs}
+            />
+          </>
+        )}
+
+        {currentTab === 'blog' && (
+          <BlogView
+            articles={cms.blogArticles || []}
+            onSelectArticle={handleSelectArticle}
             onRequestProject={handleOpenGeneralInquiry}
           />
         )}
 
-        {currentTab === 'contact' && (
-          <ContactView
-            identity={cms.identity}
-            contactFormConfig={cms.contactForm}
-            faqs={cms.home.faqSection?.faqs}
-          />
+        {currentTab === 'blog-post' && (
+          activeArticle ? (
+            <BlogPostView
+              article={activeArticle}
+              allArticles={cms.blogArticles || []}
+              onBackToBlog={() => handleSelectTab('blog')}
+              onSelectArticle={handleSelectArticle}
+              onRequestProject={handleOpenGeneralInquiry}
+            />
+          ) : (
+            <NotFoundView
+              onGoHome={() => handleSelectTab('home')}
+              onSelectTab={handleSelectTab}
+              onRequestProject={handleOpenGeneralInquiry}
+            />
+          )
         )}
 
         {currentTab === 'custom-page' && activeCustomPage && (
-          <CustomPageView
-            page={activeCustomPage}
-            onBack={() => {
-              setCurrentTab('home');
-              window.history.pushState({}, '', '/');
-            }}
+          <>
+            <SEOHead
+              title={`${activeCustomPage.title} | TesfayeTech`}
+              description={activeCustomPage.seoDescription}
+              canonicalPath={`/page/${activeCustomPage.slug}`}
+              breadcrumbs={[
+                { name: 'Home', url: '/' },
+                { name: activeCustomPage.title, url: `/page/${activeCustomPage.slug}` }
+              ]}
+            />
+            <CustomPageView
+              page={activeCustomPage}
+              onBack={() => handleSelectTab('home')}
+              onRequestProject={handleOpenGeneralInquiry}
+            />
+          </>
+        )}
+
+        {currentTab === 'not-found' && (
+          <NotFoundView
+            onGoHome={() => handleSelectTab('home')}
+            onSelectTab={handleSelectTab}
             onRequestProject={handleOpenGeneralInquiry}
           />
         )}

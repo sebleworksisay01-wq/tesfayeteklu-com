@@ -102,14 +102,6 @@ export const Footer: React.FC<FooterProps> = ({
                   Web Applications & ERP
                 </button>
               </li>
-              <li>
-                <button
-                  onClick={() => onSelectTab('industries')}
-                  className="hover:text-white transition-colors text-left"
-                >
-                  Industry Demos
-                </button>
-              </li>
             </ul>
           </div>
 
@@ -139,6 +131,14 @@ export const Footer: React.FC<FooterProps> = ({
                   className="hover:text-white transition-colors text-left"
                 >
                   Contact & Inquiries
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectTab('blog')}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  Tech Blog & Insights
                 </button>
               </li>
               <li>

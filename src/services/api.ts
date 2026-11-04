@@ -323,17 +323,37 @@ export async function deleteProject(id: string): Promise<void> {
 // Inquiries API (Firestore with Fallback)
 // ----------------------------------------------------
 export async function submitInquiry(inquiryData: Record<string, unknown>): Promise<{ success: boolean; message: string; inquiryId: string }> {
-  // Public inquiries submit through the secure server-side endpoint with input validation and abuse protection
-  const res = await fetch('/api/inquiries', {
-    method: 'POST',
-    headers: getHeaders(false),
-    body: JSON.stringify(inquiryData),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Failed to submit inquiry. Please try again.');
+  // Clean undefined properties before sending to Firestore or API
+  const cleanData: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(inquiryData)) {
+    if (value !== undefined) {
+      cleanData[key] = value;
+    }
   }
-  return data;
+
+  try {
+    const res = await submitFirestoreInquiry(cleanData);
+    fetch('/api/inquiries', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(cleanData),
+    }).catch(() => {});
+    return {
+      success: true,
+      message: 'Your project inquiry has been recorded. Our solutions team will review and contact you shortly.',
+      inquiryId: res.inquiryId,
+    };
+  } catch (err) {
+    console.warn('Firestore submitInquiry fallback:', err);
+    const res = await fetch('/api/inquiries', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(cleanData),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry');
+    return data;
+  }
 }
 
 export async function fetchInquiries(): Promise<Inquiry[]> {

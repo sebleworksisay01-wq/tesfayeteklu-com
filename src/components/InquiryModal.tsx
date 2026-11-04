@@ -86,7 +86,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
         budgetRange,
         expectedCompletionDate,
         preferredContactMethod,
-        relatedProjectId: prefillProject?.id,
+        ...(prefillProject?.id ? { relatedProjectId: prefillProject.id } : {}),
       });
 
       setSuccessData({ message: res.message, inquiryId: res.inquiryId });

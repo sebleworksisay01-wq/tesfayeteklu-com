@@ -4,7 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { createServer as createViteServer } from 'vite';
 import { Project, Inquiry } from './src/types';
-import { CmsConfig, CustomPage } from './src/types/cms';
+import { CmsConfig, CustomPage, BlogArticle } from './src/types/cms';
 import { INITIAL_PROJECTS, INITIAL_INQUIRIES } from './src/data/seedData';
 import { DEFAULT_CMS_CONFIG } from './src/data/initialCmsData';
 
@@ -465,6 +465,86 @@ app.delete('/api/cms/pages/:id', requireAdminAuth, (req: Request, res: Response)
 });
 
 // ----------------------------------------------------
+// Blog Article Endpoints
+// ----------------------------------------------------
+app.get('/api/blog', (req: Request, res: Response) => {
+  const articles = appData.cms.blogArticles || [];
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  const isAdmin = token && activeSessions.has(token);
+  if (isAdmin) {
+    return res.json(articles);
+  }
+  return res.json(articles.filter((a) => a.published));
+});
+
+app.get('/api/blog/:slug', (req: Request, res: Response) => {
+  const articles = appData.cms.blogArticles || [];
+  const article = articles.find((a) => a.slug === req.params.slug || a.id === req.params.slug);
+  if (!article) {
+    return res.status(404).json({ error: 'Article not found' });
+  }
+  res.json(article);
+});
+
+app.post('/api/blog', requireAdminAuth, (req: Request, res: Response) => {
+  const { title, excerpt, content, category, tags, author, authorRole, coverImage, readingTime, published, featured, seoTitle, seoDescription } = req.body;
+  if (!title || !content) {
+    return res.status(400).json({ error: 'Title and content are required' });
+  }
+  const slug = req.body.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const articles = appData.cms.blogArticles || [];
+  const newArticle: BlogArticle = {
+    id: 'blog-' + Date.now(),
+    slug,
+    title,
+    excerpt: excerpt || '',
+    content,
+    category: category || 'Web Engineering',
+    tags: Array.isArray(tags) ? tags : [],
+    author: author || 'Tesfaye Teklu',
+    authorRole: authorRole || 'Principal Software Architect',
+    coverImage: coverImage || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+    publishedDate: new Date().toISOString().split('T')[0],
+    readingTime: readingTime || '5 min read',
+    published: published !== false,
+    featured: Boolean(featured),
+    seoTitle: seoTitle || `${title} | TesfayeTech`,
+    seoDescription: seoDescription || excerpt || '',
+  };
+  articles.unshift(newArticle);
+  appData.cms.blogArticles = articles;
+  saveData(appData);
+  res.status(201).json(newArticle);
+});
+
+app.put('/api/blog/:id', requireAdminAuth, (req: Request, res: Response) => {
+  const articles = appData.cms.blogArticles || [];
+  const index = articles.findIndex((a) => a.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Article not found' });
+  }
+  articles[index] = {
+    ...articles[index],
+    ...req.body,
+  };
+  appData.cms.blogArticles = articles;
+  saveData(appData);
+  res.json(articles[index]);
+});
+
+app.delete('/api/blog/:id', requireAdminAuth, (req: Request, res: Response) => {
+  const articles = appData.cms.blogArticles || [];
+  const index = articles.findIndex((a) => a.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Article not found' });
+  }
+  const removed = articles.splice(index, 1);
+  appData.cms.blogArticles = articles;
+  saveData(appData);
+  res.json({ success: true, removed: removed[0] });
+});
+
+// ----------------------------------------------------
 // Public & Admin Project Endpoints
 // ----------------------------------------------------
 app.get('/api/projects', (req: Request, res: Response) => {
@@ -607,42 +687,9 @@ app.get('/api/industries', (_req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
-// Rate limiting & abuse protection for prospective inquiries
-const inquiryRateLimits = new Map<string, number[]>();
-
-function checkInquiryRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const history = (inquiryRateLimits.get(ip) || []).filter((time) => now - time < 10 * 60 * 1000);
-  if (history.length >= 5) {
-    return false; // Exceeded limit
-  }
-  history.push(now);
-  inquiryRateLimits.set(ip, history);
-  return true;
-}
-
-// ----------------------------------------------------
 // Project Inquiry Endpoints
 // ----------------------------------------------------
 app.post('/api/inquiries', (req: Request, res: Response) => {
-  const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
-
-  // 1. Abuse & Rate Limiting Check (Max 5 submissions per 10 minutes per IP)
-  if (!checkInquiryRateLimit(clientIp)) {
-    return res.status(429).json({
-      error: 'Too many inquiries submitted from this connection. Please wait a few minutes before submitting again.',
-    });
-  }
-
-  // 2. Anti-spam Honeypot Protection: If hidden bot field is filled, silently discard
-  if (req.body.bot_honeypot || req.body.website_url_check) {
-    return res.status(201).json({
-      success: true,
-      message: 'Your project inquiry has been received.',
-      inquiryId: 'inq-' + Date.now(),
-    });
-  }
-
   const {
     fullName,
     companyName,
@@ -659,45 +706,33 @@ app.post('/api/inquiries', (req: Request, res: Response) => {
     relatedProjectId,
   } = req.body;
 
-  // 3. Strict Input Validation
+  // Validation
   if (!fullName || !email || !projectDescription) {
     return res.status(400).json({ error: 'Full name, email, and project description are required.' });
   }
 
-  const cleanName = String(fullName).trim();
-  const cleanEmail = String(email).trim().toLowerCase();
-  const cleanDesc = String(projectDescription).trim();
-
-  if (cleanName.length < 2 || cleanName.length > 120) {
-    return res.status(400).json({ error: 'Full name must be between 2 and 120 characters.' });
-  }
-
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (cleanEmail.length > 150 || !emailRegex.test(cleanEmail)) {
+  if (!emailRegex.test(email)) {
     return res.status(400).json({ error: 'Please provide a valid email address.' });
-  }
-
-  if (cleanDesc.length < 10 || cleanDesc.length > 5000) {
-    return res.status(400).json({ error: 'Project description must be between 10 and 5,000 characters.' });
   }
 
   const newInquiry: Inquiry = {
     id: 'inq-' + Date.now(),
-    fullName: cleanName,
-    companyName: companyName ? String(companyName).trim().slice(0, 150) : 'Independent / Individual',
-    email: cleanEmail,
-    phone: phone ? String(phone).trim().slice(0, 50) : 'Not provided',
-    country: country ? String(country).trim().slice(0, 80) : 'Unspecified',
-    solutionType: solutionType ? String(solutionType).slice(0, 100) : 'General Consultation',
-    industry: industry ? String(industry).slice(0, 120) : 'Professional and Consulting Services',
-    projectDescription: cleanDesc,
-    requiredFeatures: requiredFeatures ? String(requiredFeatures).trim().slice(0, 2000) : 'Detailed in description',
-    budgetRange: budgetRange ? String(budgetRange).slice(0, 80) : 'Flexible / Discussion',
-    expectedCompletionDate: expectedCompletionDate ? String(expectedCompletionDate).slice(0, 80) : 'Flexible',
+    fullName: String(fullName).trim(),
+    companyName: companyName ? String(companyName).trim() : 'Independent / Individual',
+    email: String(email).trim().toLowerCase(),
+    phone: phone ? String(phone).trim() : 'Not provided',
+    country: country ? String(country).trim() : 'Unspecified',
+    solutionType: solutionType || 'General Consultation',
+    industry: industry || 'Professional and Consulting Services',
+    projectDescription: String(projectDescription).trim(),
+    requiredFeatures: requiredFeatures ? String(requiredFeatures).trim() : 'Detailed in description',
+    budgetRange: budgetRange || 'Flexible / Discussion',
+    expectedCompletionDate: expectedCompletionDate || 'Flexible',
     preferredContactMethod: preferredContactMethod || 'Email',
     status: 'New',
     internalNotes: [],
-    relatedProjectId: relatedProjectId ? String(relatedProjectId).slice(0, 128) : undefined,
+    relatedProjectId,
     createdAt: new Date().toISOString(),
   };
 
@@ -789,6 +824,160 @@ app.post('/api/system/reset', requireAdminAuth, (_req: Request, res: Response) =
 });
 
 // ----------------------------------------------------
+// Search Engine Indexing Endpoints: Robots.txt & Dynamic Sitemap
+// ----------------------------------------------------
+app.get('/robots.txt', (_req: Request, res: Response) => {
+  res.type('text/plain');
+  res.send(`# Robots.txt for TesfayeTech (https://tesfayeteklu.com)
+# Professional Software Development & Digital Solutions Company in Ethiopia
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /services
+Allow: /services/
+Allow: /portfolio
+Allow: /contact
+Allow: /blog
+Allow: /blog/
+Allow: /page/
+
+# Disallow private administrative areas and internal APIs
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/login
+Disallow: /api/
+
+Host: https://tesfayeteklu.com
+Sitemap: https://tesfayeteklu.com/sitemap.xml
+`);
+});
+
+app.get('/sitemap.xml', (_req: Request, res: Response) => {
+  const baseUrl = 'https://tesfayeteklu.com';
+  const today = new Date().toISOString().split('T')[0];
+
+  const standardPages = [
+    { path: '/', priority: '1.0', changefreq: 'daily' },
+    { path: '/services', priority: '0.9', changefreq: 'weekly' },
+    { path: '/services/website-design', priority: '0.9', changefreq: 'weekly' },
+    { path: '/services/web-applications', priority: '0.9', changefreq: 'weekly' },
+    { path: '/services/mobile-apps', priority: '0.9', changefreq: 'weekly' },
+    { path: '/services/ui-ux-design', priority: '0.8', changefreq: 'monthly' },
+    { path: '/services/custom-software', priority: '0.9', changefreq: 'weekly' },
+    { path: '/portfolio', priority: '0.85', changefreq: 'weekly' },
+    { path: '/about', priority: '0.8', changefreq: 'monthly' },
+    { path: '/contact', priority: '0.85', changefreq: 'monthly' },
+    { path: '/blog', priority: '0.85', changefreq: 'daily' },
+  ];
+
+  const customPages = (appData.cms.customPages || [])
+    .filter((p) => p.published)
+    .map((p) => ({
+      path: `/page/${p.slug}`,
+      priority: '0.7',
+      changefreq: 'monthly',
+      lastmod: p.updatedAt ? p.updatedAt.split('T')[0] : today,
+    }));
+
+  const blogPages = (appData.cms.blogArticles || [])
+    .filter((a) => a.published)
+    .map((a) => ({
+      path: `/blog/${a.slug}`,
+      priority: '0.75',
+      changefreq: 'monthly',
+      lastmod: a.publishedDate || today,
+    }));
+
+  const allUrls = [
+    ...standardPages.map(
+      (p) => `  <url>
+    <loc>${baseUrl}${p.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+    ),
+    ...customPages.map(
+      (p) => `  <url>
+    <loc>${baseUrl}${p.path}</loc>
+    <lastmod>${p.lastmod}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+    ),
+    ...blogPages.map(
+      (p) => `  <url>
+    <loc>${baseUrl}${p.path}</loc>
+    <lastmod>${p.lastmod}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+    ),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+${allUrls.join('\n')}
+</urlset>`;
+
+  res.header('Content-Type', 'application/xml');
+  res.send(xml);
+});
+
+// ----------------------------------------------------
+// Crawler Pre-Rendering / Meta Tag Injection Helper
+// ----------------------------------------------------
+const BOT_USER_AGENTS = /googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest\/0\.|pinterestbot|slackbot|vkShare|W3C_Validator|whatsapp/i;
+
+function injectCrawlerMetadata(html: string, reqUrl: string): string {
+  let title = appData.cms.seo.defaultTitle;
+  let description = appData.cms.seo.metaDescription;
+  let canonicalUrl = `https://tesfayeteklu.com${reqUrl}`;
+  let ogImage = appData.cms.seo.ogImage || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80';
+  let ogType = 'website';
+
+  // Check if matching a specific page configuration
+  const pageMatch = (appData.cms.seo.pages || []).find((p) => p.path === reqUrl);
+  if (pageMatch) {
+    title = pageMatch.title;
+    description = pageMatch.metaDescription;
+    canonicalUrl = pageMatch.canonicalUrl || canonicalUrl;
+    if (pageMatch.ogImage) ogImage = pageMatch.ogImage;
+  }
+
+  // Check if matching a blog article
+  if (reqUrl.startsWith('/blog/')) {
+    const slug = reqUrl.replace('/blog/', '').split('?')[0];
+    const article = (appData.cms.blogArticles || []).find((a) => a.slug === slug);
+    if (article) {
+      title = article.seoTitle || `${article.title} | TesfayeTech`;
+      description = article.seoDescription || article.excerpt;
+      ogImage = article.coverImage;
+      ogType = 'article';
+    }
+  }
+
+  // Inject into HTML
+  html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
+  html = html.replace(/<meta name="description" content=".*?" \/>/i, `<meta name="description" content="${description}" />`);
+  html = html.replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${canonicalUrl}" />`);
+  html = html.replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${title}" />`);
+  html = html.replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${description}" />`);
+  html = html.replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${canonicalUrl}" />`);
+  html = html.replace(/<meta property="og:image" content=".*?" \/>/i, `<meta property="og:image" content="${ogImage}" />`);
+  html = html.replace(/<meta property="og:type" content=".*?" \/>/i, `<meta property="og:type" content="${ogType}" />`);
+  html = html.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${title}" />`);
+  html = html.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${description}" />`);
+  html = html.replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="${ogImage}" />`);
+
+  return html;
+}
+
+// ----------------------------------------------------
 // Vite Integration & Static Server with SPA Routing
 // ----------------------------------------------------
 async function startServer() {
@@ -797,12 +986,40 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: 'spa',
     });
+
+    // Intercept bot / crawler requests to serve pre-rendered meta tags
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
+      const userAgent = req.headers['user-agent'] || '';
+      const isBot = BOT_USER_AGENTS.test(userAgent);
+      const isBlogOrPage = req.path.startsWith('/blog/') || req.path.startsWith('/page/');
+
+      if (isBot && !req.path.startsWith('/api') && !req.path.includes('.')) {
+        try {
+          const template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+          const html = await vite.transformIndexHtml(req.url, template);
+          const injected = injectCrawlerMetadata(html, req.path);
+          return res.status(200).set({ 'Content-Type': 'text/html' }).end(injected);
+        } catch (e) {
+          return next(e);
+        }
+      }
+      next();
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+
+    app.get('*', (req: Request, res: Response) => {
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        let html = fs.readFileSync(indexPath, 'utf-8');
+        html = injectCrawlerMetadata(html, req.path);
+        res.send(html);
+      } else {
+        res.sendFile(indexPath);
+      }
     });
   }
 

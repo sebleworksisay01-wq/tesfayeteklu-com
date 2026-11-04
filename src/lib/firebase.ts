@@ -8,7 +8,7 @@
 
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
@@ -24,7 +24,15 @@ export const firebaseConfig = {
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth: Auth = getAuth(app);
-export const db: Firestore = getFirestore(app);
+export const db: Firestore = (() => {
+  try {
+    return initializeFirestore(app, {
+      ignoreUndefinedProperties: true,
+    });
+  } catch {
+    return getFirestore(app);
+  }
+})();
 export const storage: FirebaseStorage = getStorage(app);
 
 // ----------------------------------------------------

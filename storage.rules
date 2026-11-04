@@ -2,18 +2,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Default deny catch-all safety net
+    // Default deny catch-all
     match /{allPaths=**} {
       allow read, write: if false;
     }
 
     // Pinned Verified Administrator Authorization Helper
-    // Requires authenticated token with email_verified == true, pinned email, and trusted server custom claim admin == true
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email == 'contactesfaye@gmail.com'
-        && request.auth.token.admin == true;
+        && request.auth.token.email == 'contactesfaye@gmail.com';
     }
 
     // Valid Image MIME Type validation
@@ -31,42 +29,22 @@ service firebase.storage {
       return request.resource.size <= 10 * 1024 * 1024;
     }
 
-    // 1. Public Portfolio Projects Screenshots, Covers & Visual Assets
-    // Public visitors can only view published screenshots and visual demos.
-    // Uploads, updates, and deletions strictly require verified admin with custom claim.
+    // 1. Public Portfolio Projects Screenshots & Covers
     match /projects/{fileName} {
       allow read: if true;
       allow create, update: if isAdmin() && isValidImageType() && isUnderMaxSize();
       allow delete: if isAdmin();
     }
-    match /projects/{folder}/{fileName} {
-      allow read: if true;
-      allow create, update: if isAdmin() && isValidImageType() && isUnderMaxSize();
-      allow delete: if isAdmin();
-    }
 
-    // 2. Public Site Branding, Logos, Icons & Favicons
-    // Public visitors can read branding assets.
-    // Uploads, updates, and deletions strictly require verified admin with custom claim.
+    // 2. Public Site Branding, Logos & Favicons
     match /branding/{fileName} {
-      allow read: if true;
-      allow create, update: if isAdmin() && isValidImageType() && isUnderMaxSize();
-      allow delete: if isAdmin();
-    }
-    match /branding/{folder}/{fileName} {
       allow read: if true;
       allow create, update: if isAdmin() && isValidImageType() && isUnderMaxSize();
       allow delete: if isAdmin();
     }
 
     // 3. Protected Project Documentation & Spec PDFs
-    // Strictly confidential: Only the verified administrator with custom claim can read, upload, or delete.
     match /documents/{fileName} {
-      allow read: if isAdmin();
-      allow create, update: if isAdmin() && isValidDocType() && isUnderMaxSize();
-      allow delete: if isAdmin();
-    }
-    match /documents/{folder}/{fileName} {
       allow read: if isAdmin();
       allow create, update: if isAdmin() && isValidDocType() && isUnderMaxSize();
       allow delete: if isAdmin();

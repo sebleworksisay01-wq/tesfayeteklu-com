@@ -224,6 +224,38 @@ export interface ContactFormConfig {
   notificationEmail: string;
 }
 
+export interface SeoPageConfig {
+  id: string;
+  name: string;
+  path: string;
+  title: string;
+  metaDescription: string;
+  keywords: string;
+  canonicalUrl: string;
+  robots: 'index, follow' | 'noindex, nofollow';
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+}
+
+export interface BlogArticle {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags: string[];
+  author: string;
+  authorRole: string;
+  coverImage: string;
+  publishedDate: string;
+  readingTime: string;
+  published: boolean;
+  featured: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
 export interface SeoSettings {
   defaultTitle: string;
   titleTemplate: string;
@@ -231,6 +263,11 @@ export interface SeoSettings {
   keywords: string;
   ogImage: string;
   canonicalUrl: string;
+  robots?: 'index, follow' | 'noindex, nofollow';
+  googleSearchConsoleVerification?: string;
+  bingVerification?: string;
+  googleAnalyticsId?: string;
+  pages?: SeoPageConfig[];
 }
 
 export interface CmsConfig {
@@ -243,6 +280,7 @@ export interface CmsConfig {
   customPages: CustomPage[];
   contactForm: ContactFormConfig;
   seo: SeoSettings;
+  blogArticles?: BlogArticle[];
   version: number;
   lastUpdated: string;
 }

@@ -36,6 +36,24 @@ export const COLLECTIONS = {
 } as const;
 
 /**
+ * Recursively strips undefined values so Firestore never encounters unsupported field values
+ */
+export function sanitizeForFirestore<T extends Record<string, unknown>>(data: T): Record<string, unknown> {
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined) {
+      continue;
+    }
+    if (value !== null && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Timestamp) && !(value instanceof Date)) {
+      clean[key] = sanitizeForFirestore(value as Record<string, unknown>);
+    } else {
+      clean[key] = value;
+    }
+  }
+  return clean;
+}
+
+/**
  * Normalizes a Firestore document into the application Project type
  */
 function normalizeProjectDoc(id: string, data: Record<string, unknown>): Project {
@@ -198,7 +216,7 @@ export async function createFirestoreProject(project: Partial<Project>): Promise
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-  const payload: Record<string, unknown> = {
+  const payload: Record<string, unknown> = sanitizeForFirestore({
     slug: cleanSlug,
     name: project.name || project.title || 'Untitled Project',
     title: project.title || project.name || 'Untitled Project',
@@ -228,7 +246,7 @@ export async function createFirestoreProject(project: Partial<Project>): Promise
     interactiveSimulator: project.interactiveSimulator || null,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  };
+  });
 
   try {
     await setDoc(docRef, payload);
@@ -247,10 +265,10 @@ export async function createFirestoreProject(project: Partial<Project>): Promise
  */
 export async function updateFirestoreProject(id: string, updates: Partial<Project>): Promise<Project> {
   const docRef = doc(db, COLLECTIONS.PROJECTS, id);
-  const payload: Record<string, unknown> = {
+  const payload: Record<string, unknown> = sanitizeForFirestore({
     ...updates,
     updatedAt: serverTimestamp(),
-  };
+  });
 
   // Keep dual aliases synchronized
   if (updates.name) payload.title = updates.name;
@@ -343,13 +361,14 @@ export async function submitFirestoreInquiry(inquiryData: Record<string, unknown
   const newId = 'inq-' + Date.now();
   const docRef = doc(db, COLLECTIONS.INQUIRIES, newId);
 
-  const payload = {
-    ...inquiryData,
+  const cleanData = sanitizeForFirestore(inquiryData);
+  const payload = sanitizeForFirestore({
+    ...cleanData,
     id: newId,
-    status: 'New',
-    internalNotes: [],
+    status: cleanData.status || 'New',
+    internalNotes: Array.isArray(cleanData.internalNotes) ? cleanData.internalNotes : [],
     createdAt: serverTimestamp(),
-  };
+  });
 
   try {
     await setDoc(docRef, payload);

@@ -16,10 +16,12 @@ import {
   FileText, Settings, Layers, Star, AlertCircle, X, 
   Layout, Globe, Smartphone, Code2, Sliders, Database, 
   Download, Upload, RotateCcw, Palette, UserCheck, Lock, ExternalLink,
-  UploadCloud, ImageIcon
+  UploadCloud, ImageIcon, BookOpen
 } from 'lucide-react';
 import { INDUSTRIES_LIST } from '../../data/seedData';
 import { AdminLoginPage } from '../../views/AdminLoginPage';
+import { SeoManagerTab } from './SeoManagerTab';
+import { BlogManagerTab } from './BlogManagerTab';
 
 type AdminModule = 
   | 'dashboard'
@@ -31,6 +33,7 @@ type AdminModule =
   | 'categories'
   | 'industries'
   | 'pages'
+  | 'blog'
   | 'inquiries'
   | 'seo'
   | 'theme'
@@ -444,6 +447,20 @@ export const AdminCMS: React.FC<AdminCMSProps> = ({
             </span>
           </button>
           <button
+            onClick={() => { setActiveModule('blog'); setEditingProject(null); setEditingPage(null); }}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
+              activeModule === 'blog' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <span className="flex items-center gap-2.5">
+              <BookOpen className="w-4 h-4" />
+              <span>10. Blog & Articles</span>
+            </span>
+            <span className="text-2xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold font-mono">
+              {cms?.blogArticles?.length || 5}
+            </span>
+          </button>
+          <button
             onClick={() => { setActiveModule('inquiries'); setEditingProject(null); setEditingPage(null); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
               activeModule === 'inquiries' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50'
@@ -451,7 +468,7 @@ export const AdminCMS: React.FC<AdminCMSProps> = ({
           >
             <span className="flex items-center gap-2.5">
               <MessageSquare className="w-4 h-4" />
-              <span>10. Inquiry Inbox</span>
+              <span>11. Inquiry Inbox</span>
             </span>
             <span className="text-2xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold font-mono">
               {inquiries.filter((i) => i.status === 'New').length} new
@@ -2228,65 +2245,26 @@ export const AdminCMS: React.FC<AdminCMSProps> = ({
           {/* ==========================================================
            * 11. SEO SETTINGS
            * ========================================================*/}
+          {/* ==========================================================
+           * 10. BLOG & CONTENT MANAGEMENT
+           * ========================================================*/}
+          {activeModule === 'blog' && cms && (
+            <BlogManagerTab
+              cms={cms}
+              onSaveCms={saveCmsChanges}
+              saving={saving}
+            />
+          )}
+
+          {/* ==========================================================
+           * 11. SEO & SEARCH CONSOLE MANAGEMENT
+           * ========================================================*/}
           {activeModule === 'seo' && cms && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 max-w-4xl shadow-xs">
-              <div className="border-b border-slate-200 pb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900">Search Engine Optimization (SEO) & Social Cards</h2>
-                  <p className="text-xs text-slate-500">Configure global metadata, OpenGraph tags, and search engine previews</p>
-                </div>
-                <button
-                  onClick={() => saveCmsChanges({ seo: cms.seo }, 'SEO settings saved.')}
-                  disabled={saving}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Save SEO</span>
-                </button>
-              </div>
-
-              <div className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Default Page Title Tag</label>
-                  <input
-                    type="text"
-                    value={cms.seo.defaultTitle}
-                    onChange={(e) => setCms({ ...cms, seo: { ...cms.seo, defaultTitle: e.target.value } })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Meta Description Tag</label>
-                  <textarea
-                    rows={2}
-                    value={cms.seo.metaDescription}
-                    onChange={(e) => setCms({ ...cms, seo: { ...cms.seo, metaDescription: e.target.value } })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">SEO Target Keywords</label>
-                  <input
-                    type="text"
-                    value={cms.seo.keywords}
-                    onChange={(e) => setCms({ ...cms, seo: { ...cms.seo, keywords: e.target.value } })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">OpenGraph Social Share Image URL</label>
-                  <input
-                    type="text"
-                    value={cms.seo.ogImage}
-                    onChange={(e) => setCms({ ...cms, seo: { ...cms.seo, ogImage: e.target.value } })}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg"
-                  />
-                </div>
-              </div>
-            </div>
+            <SeoManagerTab
+              cms={cms}
+              onSaveCms={saveCmsChanges}
+              saving={saving}
+            />
           )}
 
           {/* ==========================================================

@@ -1,5 +1,26 @@
 {
   "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile document accessible strictly by the owning user.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "avatarUrl": { "type": "string", "maxLength": 512 },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "UserRecord": {
+      "title": "UserRecord",
+      "description": "Sub-resource record belonging to a specific user.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "data": { "type": "object" },
+        "createdAt": { "type": "string" }
+      }
+    },
     "Project": {
       "title": "Project",
       "description": "Portfolio demonstration project or client solution record.",
@@ -37,8 +58,7 @@
         "contactForm": { "type": "object" },
         "seo": { "type": "object" },
         "version": { "type": "number" },
-        "lastUpdated": { "type": "string" },
-        "isPrivate": { "type": "boolean" }
+        "lastUpdated": { "type": "string" }
       },
       "required": ["identity", "navigation", "theme"]
     },
@@ -71,20 +91,17 @@
         "lastActive": { "type": "string" },
         "notes": { "type": "string", "maxLength": 2000 }
       }
-    },
-    "UserProfile": {
-      "title": "UserProfile",
-      "description": "User profile with anti-privilege escalation constraints.",
-      "type": "object",
-      "properties": {
-        "displayName": { "type": "string", "maxLength": 100 },
-        "email": { "type": "string", "maxLength": 150 },
-        "avatarUrl": { "type": "string", "maxLength": 512 },
-        "createdAt": { "type": "string" }
-      }
     }
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile document accessible strictly by the owning user."
+    },
+    "/users/{userId}/{document=**}": {
+      "schema": "UserRecord",
+      "description": "User subcollection documents accessible strictly by the owning user."
+    },
     "/projects/{projectId}": {
       "schema": "Project",
       "description": "Categorized demo projects and showcase applications."
@@ -100,14 +117,6 @@
     "/adminData/{dataId}": {
       "schema": "AdminData",
       "description": "Administrative records restricted to the verified owner."
-    },
-    "/users/{userId}": {
-      "schema": "UserProfile",
-      "description": "Non-privileged user records preventing self-assigned roles."
-    },
-    "/test/{testId}": {
-      "schema": "AdminData",
-      "description": "Connectivity test document for network verification."
     }
   }
 }

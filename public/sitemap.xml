@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <!-- 1. Home Page -->
+  <url>
+    <loc>https://tesfayeteklu.com/</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 2. Services Overview -->
+  <url>
+    <loc>https://tesfayeteklu.com/services</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 3. Website Design -->
+  <url>
+    <loc>https://tesfayeteklu.com/services/website-design</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 4. Web Applications & ERP -->
+  <url>
+    <loc>https://tesfayeteklu.com/services/web-applications</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 5. Mobile Application Development -->
+  <url>
+    <loc>https://tesfayeteklu.com/services/mobile-apps</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 6. UI/UX Product Design -->
+  <url>
+    <loc>https://tesfayeteklu.com/services/ui-ux-design</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 7. Custom Enterprise Software -->
+  <url>
+    <loc>https://tesfayeteklu.com/services/custom-software</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 8. Portfolio & Demos -->
+  <url>
+    <loc>https://tesfayeteklu.com/portfolio</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- 9. About Us -->
+  <url>
+    <loc>https://tesfayeteklu.com/about</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 10. Contact Us -->
+  <url>
+    <loc>https://tesfayeteklu.com/contact</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- 11. Engineering Blog & Insights -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Blog Article 1 -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog/building-modern-e-commerce-in-ethiopia-telebirr-cbe-birr-integration</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Blog Article 2 -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog/custom-erp-vs-off-the-shelf-software-for-ethiopian-enterprises</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Blog Article 3 -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog/why-ethiopian-businesses-must-invest-in-responsive-mobile-first-websites</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Blog Article 4 -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog/mobile-app-development-best-practices-for-low-bandwidth-environments</loc>
+    <lastmod>2026-02-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Blog Article 5 -->
+  <url>
+    <loc>https://tesfayeteklu.com/blog/digital-transformation-in-addis-ababa-how-automation-cuts-operational-costs</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+</urlset>
