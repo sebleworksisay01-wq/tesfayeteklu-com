@@ -1,8 +1,12 @@
 {
+  "projectId": "tesfayeteklu-com",
+  "appId": "1:414838731101:web:e14979dcb4a47cda45b8b4",
   "apiKey": "AIzaSyD0IwWim2GP7vt_3BjuIXBQg3byfk3ov4U",
   "authDomain": "tesfayeteklu-com.firebaseapp.com",
-  "projectId": "tesfayeteklu-com",
+  "firestoreDatabaseId": "ai-studio-tesfayetechsoftw-1cd9edb1-6921-4952-ace8-6ec3f56563c6",
   "storageBucket": "tesfayeteklu-com.firebasestorage.app",
   "messagingSenderId": "414838731101",
-  "appId": "1:414838731101:web:873d7070908a601445b8b4"
+  "measurementId": "",
+  "oAuthClientId": "414838731101-c0dknks2fpvk7blpmrqeiku9agu16rro.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }
