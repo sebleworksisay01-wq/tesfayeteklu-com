@@ -22,16 +22,28 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { Project, Inquiry } from '../types';
-import { CmsConfig, CustomPage } from '../types/cms';
+import { Project, Inquiry, UserProfile } from '../types';
+import { CmsConfig, CustomPage, MediaItem, ContentRevision } from '../types/cms';
 import { DEFAULT_CMS_CONFIG } from '../data/initialCmsData';
 import { INITIAL_PROJECTS, INITIAL_INQUIRIES } from '../data/seedData';
 
-// Collection identifiers
+// Collection identifiers for the Complete Dynamic CMS
 export const COLLECTIONS = {
   PROJECTS: 'projects',
+  SERVICES: 'services',
+  BLOG_POSTS: 'blogPosts',
+  TESTIMONIALS: 'testimonials',
+  CLIENTS: 'clients',
+  TEAM_MEMBERS: 'teamMembers',
+  MEDIA_LIBRARY: 'mediaLibrary',
+  PAGES: 'pages',
+  HOMEPAGE_SECTIONS: 'homepageSections',
   SITE_SETTINGS: 'siteSettings',
+  WEBSITE_SETTINGS: 'websiteSettings',
+  CONTENT_REVISIONS: 'contentRevisions',
   INQUIRIES: 'inquiries',
+  USERS: 'users',
+  ADMIN_USERS: 'adminUsers',
   ADMIN_DATA: 'adminData',
 } as const;
 
@@ -333,21 +345,171 @@ export async function getFirestoreSiteSettings(): Promise<CmsConfig> {
 /**
  * Updates website settings & CMS configuration in Firestore
  */
-export async function updateFirestoreSiteSettings(config: Partial<CmsConfig>): Promise<CmsConfig> {
+export async function updateFirestoreSiteSettings(
+  config: Partial<CmsConfig>,
+  revisionSummary?: string,
+  authorEmail?: string
+): Promise<CmsConfig> {
   const docRef = doc(db, COLLECTIONS.SITE_SETTINGS, SETTINGS_DOC_ID);
+  const altDocRef = doc(db, COLLECTIONS.WEBSITE_SETTINGS, SETTINGS_DOC_ID);
+
   try {
     const current = await getFirestoreSiteSettings();
+    const newVersion = (current.version || 1) + 1;
+    const now = new Date().toISOString();
+
+    // Create automatic revision snapshot
+    const revisionItem: ContentRevision = {
+      id: 'rev-' + Date.now(),
+      version: newVersion,
+      timestamp: now,
+      authorEmail: authorEmail || 'tesfayeteklufeyissa@gmail.com',
+      summary: revisionSummary || `Update version ${newVersion} published`,
+      snapshot: { ...current, ...config },
+    };
+
+    const existingRevisions = Array.isArray(current.revisions) ? current.revisions : [];
+    const updatedRevisions = [revisionItem, ...existingRevisions].slice(0, 20);
+
     const updated: CmsConfig = {
       ...current,
       ...config,
-      version: (current.version || 1) + 1,
-      lastUpdated: new Date().toISOString(),
+      revisions: updatedRevisions,
+      version: newVersion,
+      lastUpdated: now,
     };
-    await setDoc(docRef, updated, { merge: true });
+
+    const cleanPayload = sanitizeForFirestore(updated as unknown as Record<string, unknown>);
+
+    // Dual-write to both siteSettings and websiteSettings collections
+    await setDoc(docRef, cleanPayload, { merge: true });
+    setDoc(altDocRef, cleanPayload, { merge: true }).catch(() => {});
+
+    // Also record standalone revision document in contentRevisions
+    try {
+      const revDocRef = doc(db, COLLECTIONS.CONTENT_REVISIONS, revisionItem.id);
+      setDoc(revDocRef, sanitizeForFirestore(revisionItem as unknown as Record<string, unknown>)).catch(() => {});
+    } catch {
+      // Ignore
+    }
+
     return updated;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `${COLLECTIONS.SITE_SETTINGS}/${SETTINGS_DOC_ID}`);
   }
+}
+
+/**
+ * Fetches all registered users from Firestore `users` collection
+ */
+export async function getFirestoreUsers(): Promise<UserProfile[]> {
+  try {
+    const colRef = collection(db, COLLECTIONS.USERS);
+    const snap = await getDocs(colRef);
+    if (snap.empty) {
+      return [];
+    }
+    return snap.docs.map((docSnap) => docSnap.data() as UserProfile);
+  } catch (err) {
+    console.warn('Notice reading users from Firestore:', err);
+    return [];
+  }
+}
+
+/**
+ * Updates a user profile in Firestore
+ */
+export async function updateFirestoreUser(uid: string, data: Partial<UserProfile>): Promise<void> {
+  const docRef = doc(db, COLLECTIONS.USERS, uid);
+  try {
+    const cleanData = sanitizeForFirestore({
+      ...data,
+      updatedAt: new Date().toISOString(),
+    });
+    await updateDoc(docRef, cleanData);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `${COLLECTIONS.USERS}/${uid}`);
+  }
+}
+
+/**
+ * Fetches media items from Firestore
+ */
+export async function getFirestoreMediaItems(): Promise<MediaItem[]> {
+  try {
+    const colRef = collection(db, COLLECTIONS.MEDIA_LIBRARY);
+    const snap = await getDocs(colRef);
+    if (snap.empty) {
+      const site = await getFirestoreSiteSettings();
+      return site.mediaLibrary || [];
+    }
+    return snap.docs.map((d) => d.data() as MediaItem);
+  } catch {
+    const site = await getFirestoreSiteSettings();
+    return site.mediaLibrary || [];
+  }
+}
+
+/**
+ * Saves a media item into Firestore
+ */
+export async function saveFirestoreMediaItem(item: MediaItem): Promise<void> {
+  try {
+    const docRef = doc(db, COLLECTIONS.MEDIA_LIBRARY, item.id);
+    await setDoc(docRef, sanitizeForFirestore(item as unknown as Record<string, unknown>));
+
+    // Also sync into siteSettings.mediaLibrary array
+    const site = await getFirestoreSiteSettings();
+    const currentList = Array.isArray(site.mediaLibrary) ? site.mediaLibrary : [];
+    const existsIdx = currentList.findIndex((m) => m.id === item.id);
+    let updatedList: MediaItem[];
+    if (existsIdx >= 0) {
+      updatedList = [...currentList];
+      updatedList[existsIdx] = item;
+    } else {
+      updatedList = [item, ...currentList];
+    }
+    await updateFirestoreSiteSettings({ mediaLibrary: updatedList }, `Media added: ${item.name}`);
+  } catch (err) {
+    console.warn('Notice saving media item:', err);
+  }
+}
+
+/**
+ * Deletes a media item from Firestore
+ */
+export async function deleteFirestoreMediaItem(id: string): Promise<void> {
+  try {
+    const docRef = doc(db, COLLECTIONS.MEDIA_LIBRARY, id);
+    await deleteDoc(docRef).catch(() => {});
+
+    // Also remove from siteSettings.mediaLibrary array
+    const site = await getFirestoreSiteSettings();
+    const currentList = Array.isArray(site.mediaLibrary) ? site.mediaLibrary : [];
+    const updatedList = currentList.filter((m) => m.id !== id);
+    await updateFirestoreSiteSettings({ mediaLibrary: updatedList }, `Media deleted: ${id}`);
+  } catch (err) {
+    console.warn('Notice deleting media item:', err);
+  }
+}
+
+/**
+ * Restores a previous CMS configuration revision snapshot
+ */
+export async function restoreContentRevision(revisionId: string): Promise<CmsConfig> {
+  const site = await getFirestoreSiteSettings();
+  const revisions = Array.isArray(site.revisions) ? site.revisions : [];
+  const target = revisions.find((r) => r.id === revisionId);
+
+  if (!target || !target.snapshot) {
+    throw new Error('Revision snapshot not found or corrupted.');
+  }
+
+  const restored = await updateFirestoreSiteSettings(
+    target.snapshot,
+    `Restored to revision v${target.version} (${new Date(target.timestamp).toLocaleString()})`
+  );
+  return restored;
 }
 
 // ----------------------------------------------------

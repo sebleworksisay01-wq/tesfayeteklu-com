@@ -162,7 +162,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <span>Target User Roles</span>
               </div>
               <div className="flex flex-wrap gap-2 text-xs text-slate-600">
-                {project.targetUsers.map((user, idx) => (
+                {(Array.isArray(project.targetUsers) ? project.targetUsers : [project.targetUsers]).map((user: string, idx: number) => (
                   <span key={idx} className="bg-slate-100 text-slate-800 px-3 py-1 rounded-md font-medium">
                     {user}
                   </span>

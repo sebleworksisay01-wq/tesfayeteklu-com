@@ -1,21 +1,115 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Each user can access only their own data.
+    // Helper: Validates Administrator identity
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email.lower() == 'tesfayeteklufeyissa@gmail.com';
+    }
+
+    // Helper: Validates signed-in user
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 1. Users collection (Private user accounts & Admin management)
     match /users/{userId} {
       allow read, write:
-        if request.auth != null
-        && request.auth.uid == userId;
+        if (isSignedIn() && request.auth.uid == userId) || isAdmin();
 
-      // Secure documents inside the user's subcollections.
       match /{document=**} {
         allow read, write:
-          if request.auth != null
-          && request.auth.uid == userId;
+          if (isSignedIn() && request.auth.uid == userId) || isAdmin();
       }
+    }
+
+    // 2. Public / CMS Published Collections
+    match /projects/{projectId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /blogPosts/{postId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /clients/{clientId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /teamMembers/{memberId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /pages/{pageId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 3. Centralized Website Configuration & SEO Settings
+    match /siteSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /websiteSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /homepageSections/{sectionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /seoSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /navigationMenus/{menuId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /mediaLibrary/{mediaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Inquiries (Client Quote Requests)
+    match /inquiries/{inquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 5. Protected Administrative Collections
+    match /contentRevisions/{revisionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /adminUsers/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /adminData/{dataId} {
+      allow read, write: if isAdmin();
     }
   }
 }

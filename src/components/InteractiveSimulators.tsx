@@ -125,9 +125,9 @@ const ClinicAppointmentSimulator: React.FC = () => {
   const [isBooked, setIsBooked] = useState<boolean>(false);
 
   const doctors = [
-    { name: 'Dr. Selamawit Bekele', spec: 'Cardiology Specialist', rating: '4.9 (184 reviews)', fee: '$60' },
-    { name: 'Dr. Marcus Vance', spec: 'Internal Medicine & Pulmonology', rating: '4.8 (210 reviews)', fee: '$55' },
-    { name: 'Dr. Almaz Kebede', spec: 'Pediatric Care', rating: '5.0 (340 reviews)', fee: '$50' }
+    { name: 'Dr. Selamawit Bekele', spec: 'Cardiology Specialist', rating: '4.9 (184 reviews)', fee: '3,000 ETB' },
+    { name: 'Dr. Marcus Vance', spec: 'Internal Medicine & Pulmonology', rating: '4.8 (210 reviews)', fee: '2,750 ETB' },
+    { name: 'Dr. Almaz Kebede', spec: 'Pediatric Care', rating: '5.0 (340 reviews)', fee: '2,500 ETB' }
   ];
 
   const slots = ['09:00 AM', '10:30 AM', '02:00 PM', '04:15 PM'];
@@ -669,15 +669,15 @@ const HrmsSimulator: React.FC = () => {
           <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
             <div className="bg-white p-3 rounded border border-slate-200">
               <span className="text-slate-500">Gross Salaries</span>
-              <div className="font-bold font-mono text-base text-slate-900 mt-1">$214,800.00</div>
+              <div className="font-bold font-mono text-base text-slate-900 mt-1">10,740,000.00 ETB</div>
             </div>
             <div className="bg-white p-3 rounded border border-slate-200">
               <span className="text-slate-500">Income Tax & Social Security</span>
-              <div className="font-bold font-mono text-base text-slate-900 mt-1">$42,960.00</div>
+              <div className="font-bold font-mono text-base text-slate-900 mt-1">2,148,000.00 ETB</div>
             </div>
             <div className="bg-white p-3 rounded border border-slate-200">
               <span className="text-slate-500">Net Transfer Total</span>
-              <div className="font-bold font-mono text-base text-emerald-600 mt-1">$171,840.00</div>
+              <div className="font-bold font-mono text-base text-emerald-600 mt-1">8,592,000.00 ETB</div>
             </div>
           </div>
         </div>
@@ -709,7 +709,7 @@ const CorporatePreviewSimulator: React.FC = () => {
           Building resilient economic architectures for emerging markets.
         </h1>
         <p className="text-xs text-slate-400 max-w-md mx-auto">
-          Over $840M deployed across telecommunications, digital infrastructure, and logistics hubs.
+          Over 42 Billion ETB deployed across telecommunications, digital infrastructure, and logistics hubs.
         </p>
         <div className="pt-2 flex justify-center gap-3">
           <button className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded">
@@ -740,7 +740,7 @@ const EcommerceSimulator: React.FC = () => {
             Wireless Audio Pro
           </div>
           <div className="text-xs font-bold text-slate-800">Noise-Cancelling Studio Headphones</div>
-          <div className="text-xs font-bold text-blue-600 mt-1">$289.00</div>
+          <div className="text-xs font-bold text-blue-600 mt-1">14,450.00 ETB</div>
           <button className="mt-2 w-full py-1.5 bg-slate-900 text-white text-2xs font-semibold rounded">
             Add to Bag
           </button>
@@ -750,7 +750,7 @@ const EcommerceSimulator: React.FC = () => {
             Mechanical Keyboard
           </div>
           <div className="text-xs font-bold text-slate-800">Custom Aluminum Keeb 75%</div>
-          <div className="text-xs font-bold text-blue-600 mt-1">$175.00</div>
+          <div className="text-xs font-bold text-blue-600 mt-1">8,750.00 ETB</div>
           <button className="mt-2 w-full py-1.5 bg-slate-900 text-white text-2xs font-semibold rounded">
             Add to Bag
           </button>
@@ -760,7 +760,7 @@ const EcommerceSimulator: React.FC = () => {
             Ergonomic Desk Mat
           </div>
           <div className="text-xs font-bold text-slate-800">Wool Felt Minimalist Pad</div>
-          <div className="text-xs font-bold text-blue-600 mt-1">$45.00</div>
+          <div className="text-xs font-bold text-blue-600 mt-1">2,250.00 ETB</div>
           <button className="mt-2 w-full py-1.5 bg-slate-900 text-white text-2xs font-semibold rounded">
             Add to Bag
           </button>
@@ -786,7 +786,7 @@ const HotelSimulator: React.FC = () => {
           <div>Deluxe Savannah Suite · 2 Adults · Complimentary Morning Game Drive Included</div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-slate-900 font-mono">$1,850.00</div>
+          <div className="text-lg font-bold text-slate-900 font-mono">92,500.00 ETB</div>
           <button className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded mt-1">
             Book Direct & Save 20%
           </button>

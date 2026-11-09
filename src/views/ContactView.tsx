@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GlobalSiteIdentity, ContactFormConfig, FaqItem } from '../types/cms';
 import { submitInquiry } from '../services/api';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle, HelpCircle, MessageCircle } from 'lucide-react';
+import { Mail, Phone, Clock, Send, CheckCircle, AlertCircle, HelpCircle, MessageCircle } from 'lucide-react';
 import { INDUSTRIES_LIST } from '../data/seedData';
 
 interface ContactViewProps {
@@ -24,7 +24,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
   const [industry, setIndustry] = useState('Professional and Consulting Services');
   const [projectDescription, setProjectDescription] = useState('');
   const [requiredFeatures, setRequiredFeatures] = useState('');
-  const [budgetRange, setBudgetRange] = useState('$10,000 - $25,000');
+  const [budgetRange, setBudgetRange] = useState('10,000 ETB - 50,000 ETB');
   const [expectedCompletionDate, setExpectedCompletionDate] = useState('');
   const [preferredContactMethod, setPreferredContactMethod] = useState<'Email' | 'Phone' | 'WhatsApp' | 'Video Call'>('Email');
 
@@ -41,11 +41,9 @@ export const ContactView: React.FC<ContactViewProps> = ({
   ];
 
   const budgetOptions = contactFormConfig?.budgetOptions || [
-    '$3,000 - $7,000 (Standard Website / Small MVP)',
-    '$7,000 - $15,000 (Commercial Web / Mobile App)',
-    '$15,000 - $35,000 (Enterprise Portal / Multi-platform)',
-    '$35,000+ (Full Custom ERP / Large Scale)',
-    'Flexible / Needs Estimation'
+    '10,000 ETB - 50,000 ETB',
+    '50,000 ETB - 100,000 ETB',
+    '100,000 ETB - 150,000 ETB'
   ];
 
   const contactMethods = contactFormConfig?.contactMethods || ['Email', 'Phone', 'WhatsApp', 'Video Call'];
@@ -352,13 +350,7 @@ export const ContactView: React.FC<ContactViewProps> = ({
                 </div>
               )}
 
-              <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="text-slate-400 block">Innovation Office:</span>
-                  <span className="text-white font-medium">{identity?.address || 'Innovation Hub, Level 4, Tech Innovation Corridor'}</span>
-                </div>
-              </div>
+
 
               <div className="flex items-start gap-3">
                 <Clock className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />

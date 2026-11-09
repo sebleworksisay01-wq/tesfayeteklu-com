@@ -2,8 +2,8 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * 
- * Firebase Authentication Service for TesfayeTech
- * Pinned authorized administrator: contactesfaye@gmail.com
+ * Firebase Authentication & User Management Service for TesfayeTech
+ * Designated authorized administrator: tesfayeteklufeyissa@gmail.com
  */
 
 import {
@@ -13,22 +13,31 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification,
   onAuthStateChanged,
+  applyActionCode,
+  updateProfile,
   User,
   ActionCodeSettings,
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { AdminUser } from '../types';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
+import { AdminUser, UserProfile } from '../types';
+import { sanitizeForFirestore } from './firestoreService';
 
-export const AUTHORIZED_ADMIN_EMAIL = 'contactesfaye@gmail.com';
+export const AUTHORIZED_ADMIN_EMAIL = 'tesfayeteklufeyissa@gmail.com';
 
-export interface AdminAuthState {
+export interface AppAuthState {
   user: User | null;
+  profile: UserProfile | null;
   adminUser: AdminUser | null;
-  isAuthenticatedAdmin: boolean;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
   isEmailVerified: boolean;
   loading: boolean;
   error: string | null;
 }
+
+// Backward-compatible alias for existing imports
+export type AdminAuthState = AppAuthState;
 
 /**
  * Maps a Firebase Auth User to the internal AdminUser model if authorized and verified
@@ -44,7 +53,7 @@ export function mapFirebaseUserToAdmin(user: User | null): AdminUser | null {
   return {
     id: user.uid,
     email: user.email,
-    name: user.displayName || 'Tesfaye',
+    name: user.displayName || 'Tesfaye Teklu',
     role: 'super_admin',
   };
 }
@@ -64,70 +73,315 @@ export function getFriendlyAuthErrorMessage(error: unknown): string {
     case 'auth/too-many-requests':
       return 'Access temporarily restricted due to many failed login attempts. Please reset your password or try again in 15 minutes.';
     case 'auth/user-disabled':
-      return 'This administrator account has been disabled. Please contact system support.';
+      return 'This user account has been disabled. Please contact system support.';
     case 'auth/invalid-email':
       return 'The email address format is invalid.';
     case 'auth/email-already-in-use':
       return 'An account with this email address already exists. Please sign in instead.';
     case 'auth/weak-password':
-      return 'Password is too weak. Please use at least 8 characters with letters, numbers, and symbols.';
+      return 'Password is too weak. Please use at least 8 characters with letters and numbers.';
     case 'auth/network-request-failed':
       return 'Network connection failed. Please verify your internet connection.';
     case 'auth/requires-recent-login':
       return 'This sensitive operation requires a recent sign-in. Please sign in again and retry.';
+    case 'auth/invalid-action-code':
+      return 'This verification link is invalid or has already been used. Please request a new verification link.';
+    case 'auth/expired-action-code':
+      return 'Your verification link has expired. Please request a new verification link.';
     default:
       return error.message || 'Authentication operation failed.';
   }
 }
 
 /**
- * Authenticates the administrator via Firebase Auth
+ * Get action code settings for email verification
+ */
+export function getActionCodeSettings(): ActionCodeSettings {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://tesfayeteklu.com';
+  return {
+    url: `${origin}/login?verified=true`,
+    handleCodeInApp: false,
+  };
+}
+
+/**
+ * Fetches user profile document from Firestore
+ */
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      return snap.data() as UserProfile;
+    }
+    return null;
+  } catch (err) {
+    console.warn('Notice reading user profile from Firestore:', err);
+    return null;
+  }
+}
+
+/**
+ * Updates a user profile in Firestore
+ */
+export async function updateUserProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const cleanData = sanitizeForFirestore({
+      ...data,
+      updatedAt: new Date().toISOString(),
+    });
+    await updateDoc(userRef, cleanData);
+  } catch (err) {
+    console.warn('Notice updating user profile in Firestore:', err);
+  }
+}
+
+/**
+ * Register a new user with Firebase Authentication and create their profile in Firestore.
+ * Automatically sends an email verification link and enforces email verification before login.
+ */
+export async function registerUserWithFirebase(
+  fullName: string,
+  email: string,
+  password: string
+): Promise<{ success: boolean; message: string; uid: string }> {
+  const cleanName = fullName.trim();
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!cleanName) {
+    throw new Error('Full Name is required.');
+  }
+  if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new Error('Please enter a valid email address.');
+  }
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters in length.');
+  }
+
+  // 1. Create account via Firebase Auth
+  const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+  const user = userCredential.user;
+
+  // 2. Set Firebase Auth display name
+  try {
+    await updateProfile(user, { displayName: cleanName });
+  } catch (err) {
+    console.warn('Notice setting user displayName:', err);
+  }
+
+  // 3. Determine initial role
+  const isTargetAdmin = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+  const role: 'Administrator' | 'User' = isTargetAdmin ? 'Administrator' : 'User';
+
+  // 4. Create user profile document in Firestore collection `users/{uid}`
+  const now = new Date().toISOString();
+  const profileDoc: UserProfile = {
+    uid: user.uid,
+    fullName: cleanName,
+    email: normalizedEmail,
+    role,
+    emailVerified: false,
+    accountStatus: 'active',
+    createdAt: now,
+    updatedAt: now,
+    lastLoginAt: now,
+  };
+
+  try {
+    await setDoc(doc(db, 'users', user.uid), sanitizeForFirestore(profileDoc as unknown as Record<string, unknown>));
+  } catch (err) {
+    console.warn('Notice writing profile document to Firestore:', err);
+  }
+
+  // 5. Automatically send Firebase email verification link
+  try {
+    await sendEmailVerification(user, getActionCodeSettings());
+  } catch (err) {
+    console.warn('Notice dispatching verification link:', err);
+  }
+
+  // 6. Sign out immediately so unverified accounts cannot access protected areas
+  await fbSignOut(auth);
+
+  return {
+    success: true,
+    message: `Account created successfully! A verification link has been sent to ${normalizedEmail}. Please check your inbox and verify your email before logging in.`,
+    uid: user.uid,
+  };
+}
+
+/**
+ * Custom error class for unverified email logins
+ */
+export class UnverifiedEmailError extends Error {
+  isUnverified: boolean;
+  email: string;
+
+  constructor(email: string) {
+    super('Your email address has not been verified. Please check your inbox and verify your email before logging in.');
+    this.name = 'UnverifiedEmailError';
+    this.isUnverified = true;
+    this.email = email;
+  }
+}
+
+/**
+ * Authenticates user via Firebase Auth.
+ * Mandatory email verification:
+ * - Checks user.emailVerified after fresh reload()
+ * - If not verified: rejects access and signs out
+ * - If verified: updates Firestore document, returns user and profile
  */
 export async function loginWithFirebase(
   email: string,
   password: string
-): Promise<{ user: User; adminUser: AdminUser }> {
+): Promise<{ user: User; profile: UserProfile | null; adminUser: AdminUser | null; isAdmin: boolean }> {
   const normalizedEmail = email.trim().toLowerCase();
-
-  // Strict check before contacting Firebase Auth
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
-    throw new Error('Invalid email or password.');
-  }
 
   const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
   const fbUser = userCredential.user;
 
-  // Strict check: account must be email verified for administrator access
-  // Reload user to ensure latest verification state from server
+  // Crucial: Call reload() to fetch the freshest verification status directly from Firebase Auth servers
   await fbUser.reload();
   const refreshedUser = auth.currentUser || fbUser;
 
+  // Strict check: Mandatory email verification
   if (!refreshedUser.emailVerified) {
-    // Optionally trigger a new verification email
-    try {
-      await sendEmailVerification(refreshedUser);
-    } catch {
-      // Ignored if rate-limited
-    }
-    throw new Error(
-      `Email verification required. A verification link has been sent to ${AUTHORIZED_ADMIN_EMAIL}. Please verify your email before accessing the dashboard.`
-    );
-  }
-
-  const admin = mapFirebaseUserToAdmin(refreshedUser);
-  if (!admin) {
+    // Sign out immediately so unverified sessions cannot persist in protected routes
     await fbSignOut(auth);
-    throw new Error('Unauthorized administrative account.');
+    throw new UnverifiedEmailError(normalizedEmail);
   }
 
-  return { user: refreshedUser, adminUser: admin };
+  // Fetch or create profile in Firestore
+  let profile = await getUserProfile(refreshedUser.uid);
+  const isTargetAdmin = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+
+  if (!profile) {
+    profile = {
+      uid: refreshedUser.uid,
+      fullName: refreshedUser.displayName || (isTargetAdmin ? 'Tesfaye Teklu' : 'User'),
+      email: normalizedEmail,
+      role: isTargetAdmin ? 'Administrator' : 'User',
+      emailVerified: true,
+      accountStatus: 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+    };
+    try {
+      await setDoc(doc(db, 'users', refreshedUser.uid), sanitizeForFirestore(profile as unknown as Record<string, unknown>));
+    } catch {
+      // Ignore
+    }
+  } else {
+    // Keep profile in sync
+    try {
+      await updateDoc(doc(db, 'users', refreshedUser.uid), sanitizeForFirestore({
+        emailVerified: true,
+        lastLoginAt: new Date().toISOString(),
+        role: isTargetAdmin ? 'Administrator' : profile.role,
+      }));
+      profile.emailVerified = true;
+      if (isTargetAdmin) profile.role = 'Administrator';
+    } catch {
+      // Ignore
+    }
+  }
+
+  const adminUser = isTargetAdmin ? mapFirebaseUserToAdmin(refreshedUser) : null;
+
+  return {
+    user: refreshedUser,
+    profile,
+    adminUser,
+    isAdmin: isTargetAdmin,
+  };
+}
+
+/**
+ * Handles Firebase action code for in-app email verification (e.g. from mode=verifyEmail&oobCode=...)
+ */
+export async function handleEmailVerificationCode(
+  oobCode: string
+): Promise<{ success: boolean; message: string }> {
+  if (!oobCode || !oobCode.trim()) {
+    throw new Error('Verification code is missing.');
+  }
+
+  try {
+    await applyActionCode(auth, oobCode.trim());
+
+    // If a user is logged in, reload their token and user data
+    if (auth.currentUser) {
+      await auth.currentUser.reload();
+      const uid = auth.currentUser.uid;
+      try {
+        await updateDoc(doc(db, 'users', uid), {
+          emailVerified: true,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch {
+        // Ignore
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Your email address has been verified successfully! You can now log in to your account.',
+    };
+  } catch (err: unknown) {
+    const errorMsg = getFriendlyAuthErrorMessage(err);
+    throw new Error(errorMsg);
+  }
+}
+
+/**
+ * Resend verification email to an email address.
+ * If user is currently signed in, uses currentUser.
+ * If not signed in but password is provided, signs in temporarily, sends verification, and signs out.
+ */
+export async function resendVerificationEmail(
+  email?: string,
+  password?: string
+): Promise<{ success: boolean; message: string }> {
+  // Scenario A: User is currently signed in
+  if (auth.currentUser) {
+    await sendEmailVerification(auth.currentUser, getActionCodeSettings());
+    return {
+      success: true,
+      message: `A fresh verification email has been sent to ${auth.currentUser.email}. Please check your inbox and spam folder.`,
+    };
+  }
+
+  // Scenario B: Email and password provided
+  if (email && password) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cred = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+    await sendEmailVerification(cred.user, getActionCodeSettings());
+    await fbSignOut(auth);
+    return {
+      success: true,
+      message: `A fresh verification email has been sent to ${normalizedEmail}. Please check your inbox.`,
+    };
+  }
+
+  // Scenario C: Target admin email
+  if (email && email.trim().toLowerCase() === AUTHORIZED_ADMIN_EMAIL) {
+    return {
+      success: true,
+      message: `To resend verification to ${email}, please enter your password on the login form or use password recovery.`,
+    };
+  }
+
+  throw new Error('Please sign in or provide your credentials to resend the verification email.');
 }
 
 /**
  * Initial Administrator Setup Procedure:
- * Enables the owner of contactesfaye@gmail.com to create their initial Firebase Auth account
+ * Enables the verified owner of tesfayeteklufeyissa@gmail.com to create their initial Firebase Auth account
  * and dispatches the mandatory email verification link.
- * Strictly rejects any other email.
+ * Strictly rejects any other address.
  */
 export async function setupInitialAdminAccount(
   email: string,
@@ -144,7 +398,35 @@ export async function setupInitialAdminAccount(
   }
 
   const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
-  await sendEmailVerification(userCredential.user);
+  const user = userCredential.user;
+
+  try {
+    await updateProfile(user, { displayName: 'Tesfaye Teklu' });
+  } catch {
+    // Ignore
+  }
+
+  // Create initial Admin document in Firestore
+  const now = new Date().toISOString();
+  const adminProfile: UserProfile = {
+    uid: user.uid,
+    fullName: 'Tesfaye Teklu',
+    email: normalizedEmail,
+    role: 'Administrator',
+    emailVerified: false,
+    accountStatus: 'active',
+    createdAt: now,
+    updatedAt: now,
+    lastLoginAt: now,
+  };
+
+  try {
+    await setDoc(doc(db, 'users', user.uid), sanitizeForFirestore(adminProfile as unknown as Record<string, unknown>));
+  } catch {
+    // Ignore
+  }
+
+  await sendEmailVerification(user, getActionCodeSettings());
   
   // Sign out immediately until email is verified
   await fbSignOut(auth);
@@ -156,24 +438,14 @@ export async function setupInitialAdminAccount(
 }
 
 /**
- * Dispatches a password reset email via Firebase Auth
+ * Dispatches a password reset email via Firebase Auth for any registered user
  */
-export async function sendAdminPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+export async function sendUserPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
   const normalizedEmail = email.trim().toLowerCase();
-
-  // Always return uniform safe confirmation to prevent email enumeration
-  const genericSuccess = {
-    success: true,
-    message: 'If an account is associated with this email address, a password reset link has been dispatched.',
-  };
-
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
-    return genericSuccess;
-  }
 
   try {
     const actionCodeSettings: ActionCodeSettings = {
-      url: window.location.origin + '/admin/login',
+      url: `${window.location.origin}/login`,
       handleCodeInApp: false,
     };
     await sendPasswordResetEmail(auth, normalizedEmail, actionCodeSettings);
@@ -181,26 +453,17 @@ export async function sendAdminPasswordReset(email: string): Promise<{ success: 
     console.warn('Notice from Firebase password reset:', err);
   }
 
-  return genericSuccess;
-}
-
-/**
- * Resends the verification email to the current administrator
- */
-export async function resendVerificationEmail(): Promise<{ success: boolean; message: string }> {
-  const current = auth.currentUser;
-  if (!current) {
-    throw new Error('No user is currently signed in to receive verification.');
-  }
-  await sendEmailVerification(current);
   return {
     success: true,
-    message: `Verification email resent to ${current.email}. Please check your inbox and spam folder.`,
+    message: `If an account is associated with ${normalizedEmail}, a password reset link has been dispatched to that inbox.`,
   };
 }
 
+// Backward-compatible alias
+export const sendAdminPasswordReset = sendUserPasswordReset;
+
 /**
- * Sign out the current administrator
+ * Sign out the current user or administrator
  */
 export async function logoutFromFirebase(): Promise<void> {
   await fbSignOut(auth);
@@ -210,14 +473,16 @@ export async function logoutFromFirebase(): Promise<void> {
  * Subscribes to real-time Firebase Auth state changes
  */
 export function subscribeToAuthState(
-  callback: (state: AdminAuthState) => void
+  callback: (state: AppAuthState) => void
 ): () => void {
   return onAuthStateChanged(auth, async (user) => {
     if (!user) {
       callback({
         user: null,
+        profile: null,
         adminUser: null,
-        isAuthenticatedAdmin: false,
+        isAuthenticated: false,
+        isAdmin: false,
         isEmailVerified: false,
         loading: false,
         error: null,
@@ -226,13 +491,34 @@ export function subscribeToAuthState(
     }
 
     const isVerified = Boolean(user.emailVerified);
-    const adminUser = mapFirebaseUserToAdmin(user);
-    const isAuthAdmin = Boolean(adminUser && isVerified);
+    const normalizedEmail = (user.email || '').trim().toLowerCase();
+    const isAdminAccount = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+    const adminUser = (isAdminAccount && isVerified) ? mapFirebaseUserToAdmin(user) : null;
+
+    let profile: UserProfile | null = null;
+    if (isVerified) {
+      profile = await getUserProfile(user.uid);
+      if (!profile) {
+        profile = {
+          uid: user.uid,
+          fullName: user.displayName || (isAdminAccount ? 'Tesfaye Teklu' : 'User'),
+          email: normalizedEmail,
+          role: isAdminAccount ? 'Administrator' : 'User',
+          emailVerified: isVerified,
+          accountStatus: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+        };
+      }
+    }
 
     callback({
       user,
+      profile,
       adminUser,
-      isAuthenticatedAdmin: isAuthAdmin,
+      isAuthenticated: isVerified,
+      isAdmin: Boolean(adminUser && isVerified),
       isEmailVerified: isVerified,
       loading: false,
       error: !isVerified

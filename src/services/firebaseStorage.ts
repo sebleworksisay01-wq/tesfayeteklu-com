@@ -76,10 +76,12 @@ export function validateStorageFile(file: File, options?: { allowDocuments?: boo
   return { valid: true };
 }
 
+export type StorageFolder = 'projects' | 'branding' | 'documents' | 'team' | 'clients' | 'blog';
+
 /**
  * Generates a safe, collision-resistant storage path
  */
-export function generateStoragePath(folder: 'projects' | 'branding' | 'documents', originalName: string): string {
+export function generateStoragePath(folder: StorageFolder, originalName: string): string {
   const cleanName = originalName.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-|-$/g, '');
   const timestamp = Date.now();
   const randomSuffix = Math.random().toString(36).substring(2, 8);
@@ -91,7 +93,7 @@ export function generateStoragePath(folder: 'projects' | 'branding' | 'documents
  */
 export function uploadFileToStorage(
   file: File,
-  folder: 'projects' | 'branding' | 'documents' = 'projects',
+  folder: StorageFolder = 'projects',
   onProgress?: UploadProgressCallback
 ): Promise<StorageUploadResult> {
   return new Promise((resolve, reject) => {

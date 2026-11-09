@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, ArrowUpRight, MessageCircle } from 'lucide-react';
+import { Mail, Phone, ArrowUpRight, MessageCircle } from 'lucide-react';
 import { GlobalSiteIdentity, CustomPage } from '../types/cms';
 
 interface FooterProps {
@@ -67,10 +67,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <span>WhatsApp: {identity.whatsapp}</span>
                 </div>
               )}
-              <div className="flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                <span className="truncate">{identity?.address || 'Innovation Tower, Level 4'}</span>
-              </div>
+
             </div>
           </div>
 
@@ -193,17 +190,8 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Quiet Bottom Subline (strictly no admin links) */}
-        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-          <div>{copyright}</div>
-          {identity?.footer?.showTrustBadges !== false && (
-            <div className="flex items-center gap-4 text-xs">
-              <span>Enterprise-Grade Security</span>
-              <span aria-hidden="true">·</span>
-              <span>REST API Persistence</span>
-              <span aria-hidden="true">·</span>
-              <span>WCAG AA Accessible</span>
-            </div>
-          )}
+        <div className="mt-12 pt-6 border-t border-slate-800 text-center text-xs text-slate-400">
+          <p>{copyright}</p>
         </div>
       </div>
     </footer>

@@ -10,13 +10,20 @@ export interface GlobalSiteIdentity {
   email: string;
   phone: string;
   whatsapp: string;
+  secondaryPhone?: string;
+  emergencyPhone?: string;
   address: string;
   businessLocation: string;
+  businessHours?: string;
+  googleMapsUrl?: string;
   socialLinks: {
     linkedin: string;
     github: string;
     twitter: string;
     youtube?: string;
+    facebook?: string;
+    instagram?: string;
+    telegram?: string;
   };
   announcementBar: {
     enabled: boolean;
@@ -31,16 +38,27 @@ export interface GlobalSiteIdentity {
   };
 }
 
-export interface NavigationConfig {
-  items: {
+export interface NavigationMenuItem {
+  id: string;
+  label: string;
+  tab: string;
+  url?: string;
+  isExternal?: boolean;
+  visible: boolean;
+  order: number;
+  children?: {
     id: string;
     label: string;
-    tab: string;
-    visible: boolean;
-    order: number;
+    tab?: string;
+    url?: string;
   }[];
+}
+
+export interface NavigationConfig {
+  items: NavigationMenuItem[];
   ctaButtonText: string;
   ctaDestination: 'inquiry' | 'contact' | 'custom';
+  customCtaUrl?: string;
 }
 
 export interface ThemeConfig {
@@ -60,6 +78,7 @@ export interface HomePageSectionVisibility {
   process: boolean;
   whyUs: boolean;
   testimonials: boolean;
+  clients: boolean;
   faq: boolean;
   contactCta: boolean;
 }
@@ -74,6 +93,7 @@ export interface HomePageHeroConfig {
   secondaryCtaTab: string;
   imageUrl: string;
   imageCaption: string;
+  secondaryImages?: string[];
 }
 
 export interface MetricItem {
@@ -81,6 +101,7 @@ export interface MetricItem {
   value: string;
   label: string;
   subtext?: string;
+  order?: number;
 }
 
 export interface ProcessStepItem {
@@ -103,15 +124,103 @@ export interface TestimonialItem {
   author: string;
   role: string;
   company: string;
+  avatarUrl?: string;
+  rating?: number; // 1 to 5
   metric: string;
-  isSample: boolean;
+  isSample?: boolean;
+  featured?: boolean;
+  order?: number;
   published: boolean;
+  createdAt?: string;
+}
+
+export interface ClientPartnerItem {
+  id: string;
+  name: string;
+  logoUrl: string;
+  websiteUrl?: string;
+  industry: string;
+  partnershipType: 'Client' | 'Tech Partner' | 'Certified Vendor';
+  featured: boolean;
+  order: number;
+  published: boolean;
+  createdAt: string;
+}
+
+export interface TeamMemberItem {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  photoUrl: string;
+  department: 'Leadership' | 'Engineering' | 'Design' | 'Product' | 'Operations';
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    github?: string;
+  };
+  order: number;
+  published: boolean;
+  createdAt: string;
+}
+
+export interface AboutValueItem {
+  id: string;
+  title: string;
+  description: string;
+  iconName?: string;
+}
+
+export interface AboutAchievementItem {
+  id: string;
+  metric: string;
+  label: string;
+}
+
+export interface AboutUsConfig {
+  title: string;
+  subtitle: string;
+  badgeText: string;
+  mission: string;
+  vision: string;
+  companyStory: string;
+  corePillars: AboutValueItem[];
+  achievements: AboutAchievementItem[];
+  bannerImage?: string;
+  technicalCapabilities?: {
+    category: string;
+    technologies: string;
+  }[];
+  updatedAt?: string;
+}
+
+export interface MediaItem {
+  id: string;
+  name: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number; // in bytes
+  folder: 'projects' | 'branding' | 'team' | 'clients' | 'blog' | 'documents';
+  uploadedAt: string;
+  uploadedBy?: string;
+  altText?: string;
+}
+
+export interface ContentRevision {
+  id: string;
+  version: number;
+  timestamp: string;
+  authorEmail: string;
+  summary: string;
+  snapshot: Partial<CmsConfig>;
 }
 
 export interface FaqItem {
   id: string;
   q: string;
   a: string;
+  order?: number;
   published: boolean;
 }
 
@@ -148,6 +257,11 @@ export interface HomePageConfig {
     description: string;
     items: TestimonialItem[];
   };
+  clientsSection?: {
+    kicker: string;
+    title: string;
+    description: string;
+  };
   faqSection: {
     kicker: string;
     title: string;
@@ -170,9 +284,14 @@ export interface ManagedService {
   iconName: string;
   shortDescription: string;
   fullDescription: string;
+  serviceImage?: string;
+  serviceCategory?: string;
+  features?: string[];
   benefits: string[];
   deliverables: string[];
   quoteCtaText: string;
+  seoTitle?: string;
+  seoDescription?: string;
   order: number;
   published: boolean;
 }
@@ -275,9 +394,15 @@ export interface CmsConfig {
   navigation: NavigationConfig;
   theme: ThemeConfig;
   home: HomePageConfig;
+  aboutUs?: AboutUsConfig;
   services: ManagedService[];
   industries: ManagedIndustry[];
   customPages: CustomPage[];
+  testimonials?: TestimonialItem[];
+  clients?: ClientPartnerItem[];
+  teamMembers?: TeamMemberItem[];
+  mediaLibrary?: MediaItem[];
+  revisions?: ContentRevision[];
   contactForm: ContactFormConfig;
   seo: SeoSettings;
   blogArticles?: BlogArticle[];

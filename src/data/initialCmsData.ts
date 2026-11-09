@@ -13,11 +13,11 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
     logoText: 'TesfayeTech',
     logoUrl: '',
     faviconUrl: '',
-    email: 'info@tesfayetech.com',
-    phone: '+1 (800) 456-7890 / +251 911 234 567',
-    whatsapp: '+251 911 234 567',
-    address: 'Tesfaye Innovation Tower, Level 4, Tech Innovation Corridor',
-    businessLocation: 'Bole Innovation District, Addis Ababa & Remote Global',
+    email: 'info@tesfayeteklu.com',
+    phone: '+251-932083373',
+    whatsapp: '+251-932083373',
+    address: '',
+    businessLocation: '',
     socialLinks: {
       linkedin: 'https://linkedin.com/company/tesfayetech',
       github: 'https://github.com/tesfayetech',
@@ -33,19 +33,16 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
     footer: {
       summary: 'Engineering high-performance websites, custom web applications, mobile platforms, and enterprise automation software designed to scale organizations.',
       copyrightText: '© 2026 TesfayeTech Solutions. All rights reserved. Professional software engineering and digital transformation.',
-      showTrustBadges: true
+      showTrustBadges: false
     }
   },
 
   navigation: {
     items: [
       { id: 'nav-home', label: 'Home', tab: 'home', visible: true, order: 1 },
-      { id: 'nav-websites', label: 'Website Design', tab: 'websites', visible: true, order: 2 },
-      { id: 'nav-mobile', label: 'Mobile Apps', tab: 'mobile', visible: true, order: 3 },
-      { id: 'nav-webapps', label: 'Web Applications', tab: 'webapps', visible: true, order: 4 },
-      { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 5 },
-      { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 6 },
-      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 7 }
+      { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 2 },
+      { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 3 },
+      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 4 }
     ],
     ctaButtonText: 'Request a Project',
     ctaDestination: 'inquiry'
@@ -64,11 +61,12 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
     sectionVisibility: {
       hero: true,
       metrics: true,
-      categories: true,
+      categories: false,
       featuredDemos: true,
       process: true,
       whyUs: true,
       testimonials: true,
+      clients: false,
       faq: true,
       contactCta: true
     },
@@ -80,8 +78,8 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
       primaryCtaTab: 'webapps',
       secondaryCtaText: 'Start Your Project',
       secondaryCtaTab: 'inquiry',
-      imageUrl: '/src/assets/images/hero_tech_agency_1793079157707.jpg',
-      imageCaption: 'Software Architecture & Engineering · High-Throughput Cloud Deployment'
+      imageUrl: '/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png',
+      imageCaption: ''
     },
     metrics: [
       { id: 'm-1', value: '18+', label: 'Industry Sectors Engineered', subtext: 'Proven custom domain models' },
@@ -468,11 +466,9 @@ Engagements follow structured milestone billing (e.g. Discovery & Design Approva
       'UI/UX Product Design'
     ],
     budgetOptions: [
-      '$3,000 - $7,000 (Standard Website / Small MVP)',
-      '$7,000 - $15,000 (Commercial Web / Mobile App)',
-      '$15,000 - $35,000 (Enterprise Portal / Multi-platform)',
-      '$35,000+ (Full Custom ERP / Large Scale)',
-      'Flexible / Needs Estimation'
+      '10,000 ETB - 50,000 ETB',
+      '50,000 ETB - 100,000 ETB',
+      '100,000 ETB - 150,000 ETB'
     ],
     contactMethods: ['Email', 'Phone', 'WhatsApp', 'Video Call'],
     confirmationMessage: 'Your project inquiry has been received. Our solutions team will review and contact you within 24 business hours.',
@@ -493,5 +489,263 @@ Engagements follow structured milestone billing (e.g. Discovery & Design Approva
     googleAnalyticsId: "G-TESFAYETECH",
     pages: DEFAULT_SEO_PAGES
   },
-  blogArticles: DEFAULT_BLOG_ARTICLES
+  blogArticles: DEFAULT_BLOG_ARTICLES,
+
+  aboutUs: {
+    title: 'Engineering High-Impact Digital Solutions for Growing Enterprises',
+    subtitle: 'Full-stack software engineering and digital transformation consultancy based in Addis Ababa, Ethiopia.',
+    badgeText: 'About TesfayeTech',
+    mission: 'To eliminate operational friction and technical debt for East African and global enterprises through high-performance, maintainable software architecture.',
+    vision: 'To be the preeminent software engineering partner across emerging markets, recognized globally for architectural integrity, flawless user experiences, and enduring business impact.',
+    companyStory: 'Founded on the principle that modern software should be an enduring asset rather than a continuous liability, TesfayeTech pairs rigorous full-stack engineering with human-centered product design. Whether architecting real-time telemetry platforms or enterprise healthcare systems, we deliver performant, cloud-native solutions that empower organizations to scale with confidence.',
+    corePillars: [
+      {
+        id: 'cp-1',
+        title: 'Zero Vendor Lock-In',
+        description: 'Clean code, open standards, and 100% repository and database ownership transferred to every client.',
+        iconName: 'ShieldCheck'
+      },
+      {
+        id: 'cp-2',
+        title: 'Speed & Performance First',
+        description: 'Sub-second page loads, 60fps mobile interfaces, and optimized database queries built for resilient low-bandwidth operation.',
+        iconName: 'Zap'
+      },
+      {
+        id: 'cp-3',
+        title: 'Type-Safe Architecture',
+        description: 'Strict TypeScript across frontend, backend, and database models preventing runtime defects before production deployment.',
+        iconName: 'Code2'
+      },
+      {
+        id: 'cp-4',
+        title: 'Enterprise Security by Default',
+        description: 'Role-based access controls, encrypted credential vaults, and zero-trust cloud data pipelines that protect proprietary business workflows.',
+        iconName: 'Lock'
+      }
+    ],
+    achievements: [
+      { id: 'ach-1', metric: '18+', label: 'Enterprise Sectors Engineered' },
+      { id: 'ach-2', metric: '99.9%', label: 'Uptime SLA & Cloud Reliability' },
+      { id: 'ach-3', metric: '42M+ ETB', label: 'Telemetry & Transactions Handled' },
+      { id: 'ach-4', metric: '100%', label: 'Source Code & IP Ownership' }
+    ],
+    technicalCapabilities: [
+      { category: 'Front-End & Mobile', technologies: 'React 19, React Native, TypeScript, Tailwind CSS, Vite, Next.js' },
+      { category: 'Back-End & APIs', technologies: 'Node.js, Express, Go, Python, RESTful Services, GraphQL, WebSockets' },
+      { category: 'Databases & Storage', technologies: 'Cloud Firestore, PostgreSQL, Redis, Firebase Storage, MongoDB' },
+      { category: 'Cloud & DevOps', technologies: 'Google Cloud Platform, Docker, Kubernetes, CI/CD Actions, Cloudflare' }
+    ],
+    updatedAt: new Date().toISOString()
+  },
+
+  clients: [
+    {
+      id: 'cli-1',
+      name: 'Awash Intercity Logistics',
+      logoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://awashlogistics.example.com',
+      industry: 'Transportation and Logistics',
+      partnershipType: 'Client',
+      featured: true,
+      order: 1,
+      published: true,
+      createdAt: '2026-10-01T00:00:00Z'
+    },
+    {
+      id: 'cli-2',
+      name: 'Oasis Polyclinics Network',
+      logoUrl: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://oasisclinics.example.com',
+      industry: 'Healthcare and Pharmaceuticals',
+      partnershipType: 'Client',
+      featured: true,
+      order: 2,
+      published: true,
+      createdAt: '2026-10-05T00:00:00Z'
+    },
+    {
+      id: 'cli-3',
+      name: 'Dashen Commercial Hub',
+      logoUrl: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://dashenhub.example.com',
+      industry: 'Retail and E-commerce',
+      partnershipType: 'Client',
+      featured: true,
+      order: 3,
+      published: true,
+      createdAt: '2026-10-10T00:00:00Z'
+    },
+    {
+      id: 'cli-4',
+      name: 'Telebirr Integrations Hub',
+      logoUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://telebirr.et',
+      industry: 'Financial Technology',
+      partnershipType: 'Tech Partner',
+      featured: true,
+      order: 4,
+      published: true,
+      createdAt: '2026-10-12T00:00:00Z'
+    },
+    {
+      id: 'cli-5',
+      name: 'Addis Agro-Commodities Export',
+      logoUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://addisagro.example.com',
+      industry: 'Agriculture and Agribusiness',
+      partnershipType: 'Client',
+      featured: true,
+      order: 5,
+      published: true,
+      createdAt: '2026-10-15T00:00:00Z'
+    },
+    {
+      id: 'cli-6',
+      name: 'Serengeti Vista Hospitality',
+      logoUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=240&q=80',
+      websiteUrl: 'https://serengetivista.example.com',
+      industry: 'Hospitality and Tourism',
+      partnershipType: 'Client',
+      featured: true,
+      order: 6,
+      published: true,
+      createdAt: '2026-10-18T00:00:00Z'
+    }
+  ],
+
+  teamMembers: [
+    {
+      id: 'tm-1',
+      name: 'Tesfaye Teklu',
+      role: 'Founder & Principal Software Architect',
+      bio: 'Over 12 years of enterprise software architecture, full-stack systems engineering, and technology strategy across East Africa and international hubs.',
+      photoUrl: '/assets/aistudio/tesimage-removebg-preview_af029598.png',
+      department: 'Leadership',
+      socialLinks: {
+        linkedin: 'https://linkedin.com/in/tesfayeteklu',
+        github: 'https://github.com/tesfayeteklu',
+        twitter: 'https://twitter.com/tesfayeteklu'
+      },
+      order: 1,
+      published: true,
+      createdAt: '2026-10-01T00:00:00Z'
+    },
+    {
+      id: 'tm-2',
+      name: 'Selamawit Bekele',
+      role: 'Head of Engineering & Full-Stack Lead',
+      bio: 'Specialist in high-throughput React systems, distributed Node.js backends, database query optimization, and resilient API gateways.',
+      photoUrl: '',
+      department: 'Engineering',
+      socialLinks: {
+        linkedin: 'https://linkedin.com/company/tesfayetech',
+        github: 'https://github.com/tesfayetech'
+      },
+      order: 2,
+      published: true,
+      createdAt: '2026-10-05T00:00:00Z'
+    },
+    {
+      id: 'tm-3',
+      name: 'Dawit Haile',
+      role: 'Lead UI/UX Product Designer',
+      bio: 'Human-centered design leader crafting high-converting web applications, intuitive mobile experiences, and scalable design token systems.',
+      photoUrl: '',
+      department: 'Design',
+      socialLinks: {
+        linkedin: 'https://linkedin.com/company/tesfayetech'
+      },
+      order: 3,
+      published: true,
+      createdAt: '2026-10-10T00:00:00Z'
+    },
+    {
+      id: 'tm-4',
+      name: 'Almaz Kebede',
+      role: 'DevOps & Cloud Systems Architect',
+      bio: 'Cloud automation specialist managing container orchestration, automated CI/CD pipelines, Zero-Trust network security, and 99.9% uptime SLAs.',
+      photoUrl: '',
+      department: 'Engineering',
+      socialLinks: {
+        linkedin: 'https://linkedin.com/company/tesfayetech',
+        github: 'https://github.com/tesfayetech'
+      },
+      order: 4,
+      published: true,
+      createdAt: '2026-10-15T00:00:00Z'
+    }
+  ],
+
+  mediaLibrary: [
+    {
+      id: 'med-hero-banner',
+      name: 'TesfayeTech Digital Solutions Hero Banner',
+      fileName: 'TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png',
+      fileUrl: '/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png',
+      fileType: 'image/png',
+      fileSize: 1856031,
+      folder: 'branding',
+      uploadedAt: new Date().toISOString(),
+      altText: 'TesfayeTech Digital Solutions Official Hero Banner'
+    },
+    {
+      id: 'med-1',
+      name: 'Hero Tech Agency Showcase',
+      fileName: 'hero_tech_agency_1793079157707.jpg',
+      fileUrl: '/src/assets/images/hero_tech_agency_1793079157707.jpg',
+      fileType: 'image/jpeg',
+      fileSize: 245000,
+      folder: 'branding',
+      uploadedAt: '2026-10-20T10:00:00Z',
+      altText: 'TesfayeTech Software Architecture & Engineering'
+    },
+    {
+      id: 'med-2',
+      name: 'Website Design Showcase',
+      fileName: 'website_design_showcase_1793079157923.jpg',
+      fileUrl: '/src/assets/images/website_design_showcase_1793079157923.jpg',
+      fileType: 'image/jpeg',
+      fileSize: 310000,
+      folder: 'projects',
+      uploadedAt: '2026-10-20T10:05:00Z',
+      altText: 'Corporate Website Design Showcase'
+    },
+    {
+      id: 'med-3',
+      name: 'Web App ERP Dashboard',
+      fileName: 'web_app_dashboard_1793079158006.jpg',
+      fileUrl: '/src/assets/images/web_app_dashboard_1793079158006.jpg',
+      fileType: 'image/jpeg',
+      fileSize: 285000,
+      folder: 'projects',
+      uploadedAt: '2026-10-20T10:10:00Z',
+      altText: 'Enterprise Web Application and ERP Suite'
+    },
+    {
+      id: 'med-4',
+      name: 'Mobile App Mockup',
+      fileName: 'mobile_app_mockup_1793079158082.jpg',
+      fileUrl: '/src/assets/images/mobile_app_mockup_1793079158082.jpg',
+      fileType: 'image/jpeg',
+      fileSize: 260000,
+      folder: 'projects',
+      uploadedAt: '2026-10-20T10:15:00Z',
+      altText: 'Cross-Platform Mobile Application Development'
+    }
+  ],
+
+  revisions: [
+    {
+      id: 'rev-baseline',
+      version: 1,
+      timestamp: '2026-11-01T00:00:00Z',
+      authorEmail: 'tesfayeteklufeyissa@gmail.com',
+      summary: 'Initial System Deployment & Production CMS Baseline',
+      snapshot: {
+        version: 1,
+        lastUpdated: '2026-11-01T00:00:00Z'
+      }
+    }
+  ]
 };

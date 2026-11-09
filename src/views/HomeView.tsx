@@ -3,7 +3,7 @@ import { Project } from '../types';
 import { CmsConfig } from '../types/cms';
 import { ProjectCard } from '../components/ProjectCard';
 import { 
-  ArrowRight, CheckCircle2, Code2, Smartphone, Globe, 
+  ArrowRight, CheckCircle2, 
   HelpCircle, ChevronDown, Sparkles 
 } from 'lucide-react';
 
@@ -30,11 +30,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const visibility = home?.sectionVisibility || {
     hero: true,
     metrics: true,
-    categories: true,
+    categories: false,
     featuredDemos: true,
     process: true,
     whyUs: true,
     testimonials: true,
+    clients: false,
     faq: true,
     contactCta: true
   };
@@ -117,10 +118,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Right Hero Image Card */}
               <div className="lg:col-span-5">
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-xl bg-slate-900 aspect-4/3 group">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-xl bg-slate-900 aspect-16/9 group">
                   <img
-                    src={home?.hero?.imageUrl || '/src/assets/images/hero_tech_agency_1793079157707.jpg'}
-                    alt="TesfayeTech Software Studio"
+                    src={home?.hero?.imageUrl || '/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png'}
+                    alt="TesfayeTech Digital Solutions"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                   />
@@ -152,112 +153,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
       )}
 
-      {/* ==============================================================
-       * 2. SOLUTION CATEGORIES TRIAD
-       * ============================================================*/}
-      {visibility.categories !== false && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-            <div className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-              {home?.categoriesSection?.kicker || 'Core Expertise'}
-            </div>
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-              {home?.categoriesSection?.title || 'Specialized Software Solutions'}
-            </h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              {home?.categoriesSection?.description || 'Choose from our three foundational delivery disciplines or combine them into a unified omnichannel digital platform.'}
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Card 1: Website Design */}
-            <div 
-              onClick={() => onSelectTab('websites')}
-              className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Globe className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                  Website Design & Development
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Corporate portals, consulting websites, e-commerce storefronts, hotel booking systems, and educational platforms engineered for high conversions and SEO.
-                </p>
-                <div className="pt-2 space-y-1.5 text-2xs text-slate-500">
-                  <div>· High-speed sub-second load times</div>
-                  <div>· Responsive desktop, tablet, and mobile layouts</div>
-                  <div>· Integrated CMS & multi-lingual support</div>
-                </div>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-                <span>Explore Website Demos</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-
-            {/* Card 2: Mobile Apps */}
-            <div 
-              onClick={() => onSelectTab('mobile')}
-              className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Smartphone className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                  Mobile Application Development
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Native iOS, Android, and cross-platform apps for fintech banking, food delivery, doctor appointments, customer loyalty, and logistics tracking.
-                </p>
-                <div className="pt-2 space-y-1.5 text-2xs text-slate-500">
-                  <div>· Biometric face/fingerprint authentication</div>
-                  <div>· Push notification & real-time messaging engines</div>
-                  <div>· Offline caching and background synchronization</div>
-                </div>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-                <span>Explore Mobile Demos</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-
-            {/* Card 3: Web Apps & ERP */}
-            <div 
-              onClick={() => onSelectTab('webapps')}
-              className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Code2 className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                  Web Application & ERP Systems
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Mission-critical enterprise software: HRMS, Inventory control, CRM, Point of Sale, Reinsurance, Hospital management, and Business Intelligence dashboards.
-                </p>
-                <div className="pt-2 space-y-1.5 text-2xs text-slate-500">
-                  <div>· Role-based access control (RBAC) security</div>
-                  <div>· Automated payroll, inventory, and ledger processing</div>
-                  <div>· Enterprise database integrity and REST/GraphQL APIs</div>
-                </div>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-                <span>Explore Web App Demos</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-
-          </div>
-        </section>
-      )}
 
       {/* ==============================================================
        * 3. FEATURED DEMO MARKETPLACE SHOWCASE
@@ -341,6 +237,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </section>
       )}
+
+
 
       {/* ==============================================================
        * 5. WHY CHOOSE TESFAYETECH & TESTIMONIALS

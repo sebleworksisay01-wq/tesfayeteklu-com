@@ -12,10 +12,13 @@ Allow: /blog
 Allow: /blog/
 Allow: /page/
 
-# Disallow private administrative panels and internal API endpoints
+# Disallow private administrative panels, user accounts, and auth pages
 Disallow: /admin
 Disallow: /admin/
 Disallow: /admin/login
+Disallow: /login
+Disallow: /register
+Disallow: /account
 Disallow: /api/
 
 # Host and Sitemap directives

@@ -2,23 +2,20 @@
   "entities": {
     "UserProfile": {
       "title": "UserProfile",
-      "description": "User profile document accessible strictly by the owning user.",
+      "description": "User profile document accessible strictly by the owning user and administrator.",
       "type": "object",
       "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
         "displayName": { "type": "string", "maxLength": 100 },
+        "fullName": { "type": "string", "maxLength": 100 },
         "email": { "type": "string", "maxLength": 150 },
+        "role": { "type": "string", "enum": ["Administrator", "User"] },
+        "emailVerified": { "type": "boolean" },
+        "accountStatus": { "type": "string", "enum": ["active", "suspended"] },
         "avatarUrl": { "type": "string", "maxLength": 512 },
-        "createdAt": { "type": "string" }
-      }
-    },
-    "UserRecord": {
-      "title": "UserRecord",
-      "description": "Sub-resource record belonging to a specific user.",
-      "type": "object",
-      "properties": {
-        "title": { "type": "string", "maxLength": 200 },
-        "data": { "type": "object" },
-        "createdAt": { "type": "string" }
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" }
       }
     },
     "Project": {
@@ -44,6 +41,129 @@
       },
       "required": ["slug", "solutionType", "published"]
     },
+    "Service": {
+      "title": "Service",
+      "description": "Enterprise software engineering or digital consultancy service offering.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 128 },
+        "iconName": { "type": "string", "maxLength": 64 },
+        "shortDescription": { "type": "string", "maxLength": 500 },
+        "fullDescription": { "type": "string", "maxLength": 5000 },
+        "serviceImage": { "type": "string", "maxLength": 1024 },
+        "serviceCategory": { "type": "string", "maxLength": 100 },
+        "order": { "type": "number" },
+        "published": { "type": "boolean" },
+        "seoTitle": { "type": "string", "maxLength": 200 },
+        "seoDescription": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["title", "slug", "published"]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "Engineering blog post or technical news article.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 256 },
+        "slug": { "type": "string", "maxLength": 128 },
+        "excerpt": { "type": "string", "maxLength": 500 },
+        "content": { "type": "string" },
+        "author": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 100 },
+        "coverImage": { "type": "string", "maxLength": 1024 },
+        "published": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "publishedDate": { "type": "string" }
+      },
+      "required": ["title", "slug", "published"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Client review or case outcome benchmark.",
+      "type": "object",
+      "properties": {
+        "author": { "type": "string", "maxLength": 128 },
+        "company": { "type": "string", "maxLength": 150 },
+        "role": { "type": "string", "maxLength": 100 },
+        "quote": { "type": "string", "maxLength": 2000 },
+        "avatarUrl": { "type": "string", "maxLength": 1024 },
+        "rating": { "type": "number" },
+        "metric": { "type": "string", "maxLength": 100 },
+        "featured": { "type": "boolean" },
+        "published": { "type": "boolean" }
+      },
+      "required": ["author", "company", "quote", "published"]
+    },
+    "ClientPartner": {
+      "title": "ClientPartner",
+      "description": "Enterprise client logo or certified technology partnership record.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150 },
+        "logoUrl": { "type": "string", "maxLength": 1024 },
+        "websiteUrl": { "type": "string", "maxLength": 1024 },
+        "industry": { "type": "string", "maxLength": 100 },
+        "partnershipType": { "type": "string", "enum": ["Client", "Tech Partner", "Certified Vendor"] },
+        "featured": { "type": "boolean" },
+        "published": { "type": "boolean" }
+      },
+      "required": ["name", "logoUrl", "published"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "Leadership or engineering team member profile.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 120 },
+        "role": { "type": "string", "maxLength": 120 },
+        "bio": { "type": "string", "maxLength": 1000 },
+        "photoUrl": { "type": "string", "maxLength": 1024 },
+        "department": { "type": "string", "maxLength": 80 },
+        "published": { "type": "boolean" }
+      },
+      "required": ["name", "role", "published"]
+    },
+    "MediaItem": {
+      "title": "MediaItem",
+      "description": "Uploaded image or document asset tracked in the media library.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 200 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "fileUrl": { "type": "string", "maxLength": 1024 },
+        "fileType": { "type": "string", "maxLength": 100 },
+        "fileSize": { "type": "number" },
+        "folder": { "type": "string", "maxLength": 64 },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["name", "fileUrl"]
+    },
+    "ContentRevision": {
+      "title": "ContentRevision",
+      "description": "Historical snapshot of CMS configuration for version rollback.",
+      "type": "object",
+      "properties": {
+        "version": { "type": "number" },
+        "timestamp": { "type": "string" },
+        "authorEmail": { "type": "string", "maxLength": 150 },
+        "summary": { "type": "string", "maxLength": 500 },
+        "snapshot": { "type": "object" }
+      },
+      "required": ["version", "timestamp", "summary"]
+    },
+    "CustomPage": {
+      "title": "CustomPage",
+      "description": "Dynamic custom page document.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 128 },
+        "content": { "type": "string" },
+        "published": { "type": "boolean" }
+      },
+      "required": ["title", "slug", "published"]
+    },
     "SiteSettings": {
       "title": "SiteSettings",
       "description": "Centralized global configuration, identity, navigation, and theme.",
@@ -53,8 +173,12 @@
         "navigation": { "type": "object" },
         "theme": { "type": "object" },
         "home": { "type": "object" },
+        "aboutUs": { "type": "object" },
         "services": { "type": "array" },
-        "industries": { "type": "array" },
+        "clients": { "type": "array" },
+        "teamMembers": { "type": "array" },
+        "mediaLibrary": { "type": "array" },
+        "revisions": { "type": "array" },
         "contactForm": { "type": "object" },
         "seo": { "type": "object" },
         "version": { "type": "number" },
@@ -96,23 +220,67 @@
   "firestore": {
     "/users/{userId}": {
       "schema": "UserProfile",
-      "description": "User profile document accessible strictly by the owning user."
-    },
-    "/users/{userId}/{document=**}": {
-      "schema": "UserRecord",
-      "description": "User subcollection documents accessible strictly by the owning user."
+      "description": "User profile document accessible strictly by the owning user and administrator."
     },
     "/projects/{projectId}": {
       "schema": "Project",
-      "description": "Categorized demo projects and showcase applications."
+      "description": "Portfolio projects and showcase applications."
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Managed services offerings."
+    },
+    "/blogPosts/{postId}": {
+      "schema": "BlogPost",
+      "description": "Engineering articles and company news."
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "Client reviews and case impact testimonials."
+    },
+    "/clients/{clientId}": {
+      "schema": "ClientPartner",
+      "description": "Enterprise clients and certified technology partners."
+    },
+    "/teamMembers/{memberId}": {
+      "schema": "TeamMember",
+      "description": "Team profiles and leadership."
+    },
+    "/mediaLibrary/{mediaId}": {
+      "schema": "MediaItem",
+      "description": "Centralized media library assets."
+    },
+    "/contentRevisions/{revisionId}": {
+      "schema": "ContentRevision",
+      "description": "Content revision snapshots."
+    },
+    "/pages/{pageId}": {
+      "schema": "CustomPage",
+      "description": "Custom editable pages."
     },
     "/siteSettings/{settingId}": {
       "schema": "SiteSettings",
       "description": "Website CMS content, styling, branding, and navigation options."
     },
+    "/websiteSettings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Global website settings configuration."
+    },
+    "/homepageSections/{sectionId}": {
+      "schema": "SiteSettings",
+      "description": "Homepage section configurations."
+    },
+    "/seoSettings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Search engine optimization configurations."
+    },
     "/inquiries/{inquiryId}": {
       "schema": "Inquiry",
       "description": "Prospective client leads and project requests."
+    },
+    "/adminUsers/{userId}": {
+      "schema": "UserProfile",
+      "description": "Administrator account records."
     },
     "/adminData/{dataId}": {
       "schema": "AdminData",

@@ -4,9 +4,19 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Project } from './types';
-import { CmsConfig, CustomPage } from './types/cms';
-import { fetchProjects, fetchCmsConfig, verifyAdmin, getAuthToken, testConnection, subscribeToAuthState } from './services/api';
+import { User } from 'firebase/auth';
+import { Project, UserProfile } from './types';
+import { CmsConfig, CustomPage, BlogArticle } from './types/cms';
+import { 
+  fetchProjects, 
+  fetchCmsConfig, 
+  verifyAdmin, 
+  getAuthToken, 
+  testConnection, 
+  subscribeToAuthState,
+  logoutAdmin,
+  AUTHORIZED_ADMIN_EMAIL
+} from './services/api';
 import { DEFAULT_CMS_CONFIG } from './data/initialCmsData';
 import { INITIAL_PROJECTS } from './data/seedData';
 import { Navbar } from './components/Navbar';
@@ -26,8 +36,9 @@ import { InquiryModal } from './components/InquiryModal';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { InteractiveSimulatorModal } from './components/InteractiveSimulators';
 import { AdminCMS } from './components/AdminCMS/AdminCMS';
-import { AdminLoginPage } from './views/AdminLoginPage';
-import { BlogArticle } from './types/cms';
+import { AuthPage } from './views/AuthPage';
+import { AccountView } from './views/AccountView';
+import { Shield, ArrowLeft } from 'lucide-react';
 
 export default function App() {
   // Helper to parse path into tab and slugs
@@ -49,6 +60,9 @@ export default function App() {
     if (path === '/services/web-applications' || path === '/webapps') return { tab: 'webapps', blogSlug: null, pageSlug: null };
     if (path === '/portfolio' || path === '/portfolio/') return { tab: 'webapps', blogSlug: null, pageSlug: null };
     if (path === '/contact' || path === '/contact/') return { tab: 'contact', blogSlug: null, pageSlug: null };
+    if (path === '/login' || path === '/login/') return { tab: 'login', blogSlug: null, pageSlug: null };
+    if (path === '/register' || path === '/register/') return { tab: 'register', blogSlug: null, pageSlug: null };
+    if (path === '/account' || path === '/account/') return { tab: 'account', blogSlug: null, pageSlug: null };
     if (path.startsWith('/admin')) return { tab: 'admin', blogSlug: null, pageSlug: null };
     return { tab: 'not-found', blogSlug: null, pageSlug: null };
   };
@@ -59,10 +73,15 @@ export default function App() {
   const [cms, setCms] = useState<CmsConfig>(DEFAULT_CMS_CONFIG);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // URL Path & Admin Authentication State
-  const [currentPath, setCurrentPath] = useState<string>(() => window.location.pathname);
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => Boolean(getAuthToken()));
   const [authChecking, setAuthChecking] = useState<boolean>(true);
+
+  // URL Path State
+  const [currentPath, setCurrentPath] = useState<string>(() => window.location.pathname);
 
   // Slugs for dynamic routes
   const [activeCustomPageSlug, setActiveCustomPageSlug] = useState<string | null>(initialRoute.pageSlug);
@@ -82,13 +101,18 @@ export default function App() {
 
     // Real-time listener for Firebase authentication state
     const unsubscribeAuth = subscribeToAuthState((authState) => {
-      if (authState.isAuthenticatedAdmin) {
+      setCurrentUser(authState.user);
+      setUserProfile(authState.profile);
+      setIsAdmin(authState.isAdmin);
+      if (authState.isAdmin) {
         setIsAdminLoggedIn(true);
+      } else {
+        setIsAdminLoggedIn(false);
       }
       setAuthChecking(false);
     });
 
-    // Listen to browser URL changes (e.g. forward/back buttons or history changes)
+    // Listen to browser URL changes
     const handlePopState = () => {
       const path = window.location.pathname;
       setCurrentPath(path);
@@ -132,9 +156,12 @@ export default function App() {
     try {
       setAuthChecking(true);
       const res = await verifyAdmin();
-      setIsAdminLoggedIn(Boolean(res.authenticated));
+      if (res.authenticated && res.user?.email === AUTHORIZED_ADMIN_EMAIL) {
+        setIsAdminLoggedIn(true);
+        setIsAdmin(true);
+      }
     } catch {
-      setIsAdminLoggedIn(false);
+      // Ignore
     } finally {
       setAuthChecking(false);
     }
@@ -143,16 +170,40 @@ export default function App() {
   const navigateToAdmin = () => {
     window.history.pushState({}, '', '/admin');
     setCurrentPath('/admin');
+    setCurrentTab('admin');
   };
 
-  const navigateToAdminLogin = () => {
-    window.history.pushState({}, '', '/admin/login');
-    setCurrentPath('/admin/login');
+  const navigateToLogin = () => {
+    window.history.pushState({}, '', '/login');
+    setCurrentPath('/login');
+    setCurrentTab('login');
+  };
+
+  const navigateToRegister = () => {
+    window.history.pushState({}, '', '/register');
+    setCurrentPath('/register');
+    setCurrentTab('register');
+  };
+
+  const navigateToAccount = () => {
+    window.history.pushState({}, '', '/account');
+    setCurrentPath('/account');
+    setCurrentTab('account');
   };
 
   const exitAdmin = () => {
     window.history.pushState({}, '', '/');
     setCurrentPath('/');
+    setCurrentTab('home');
+  };
+
+  const handleLogout = async () => {
+    await logoutAdmin();
+    setCurrentUser(null);
+    setUserProfile(null);
+    setIsAdmin(false);
+    setIsAdminLoggedIn(false);
+    exitAdmin();
   };
 
   const getRoutePath = (tab: string, blogSlug?: string | null, pageSlug?: string | null) => {
@@ -168,6 +219,9 @@ export default function App() {
       case 'blog-post': return blogSlug ? `/blog/${blogSlug}` : '/blog';
       case 'portfolio': return '/portfolio';
       case 'custom-page': return pageSlug ? `/page/${pageSlug}` : '/';
+      case 'login': return '/login';
+      case 'register': return '/register';
+      case 'account': return '/account';
       default: return '/';
     }
   };
@@ -218,72 +272,99 @@ export default function App() {
   };
 
   // ---------------------------------------------------------------------------
-  // Secure Admin Routing Logic
+  // Dedicated Route: Login / Register Pages
   // ---------------------------------------------------------------------------
-  const isExplicitAdminLogin = currentPath === '/admin/login';
-  const isExplicitAdminDashboard = currentPath === '/admin' || window.location.hash === '#admin';
-
-  if (isExplicitAdminLogin) {
-    // If already authenticated, redirect to /admin dashboard
-    if (isAdminLoggedIn) {
-      window.history.replaceState({}, '', '/admin');
-      return (
-        <AdminCMS
-          onExit={exitAdmin}
-          onLogout={() => {
-            setIsAdminLoggedIn(false);
-            navigateToAdminLogin();
-          }}
-          onPreviewPublicSite={() => {
-            setCurrentPath('/');
-            window.history.pushState({}, '', '/');
-          }}
-          onRefreshData={loadMasterData}
-        />
-      );
-    }
-
-    // Unauthenticated: render the dedicated Administrator Login Page
+  if (currentTab === 'login' || currentTab === 'register' || currentPath === '/login' || currentPath === '/register') {
     return (
-      <AdminLoginPage
+      <AuthPage
+        initialMode={currentTab === 'register' || currentPath === '/register' ? 'register' : 'login'}
         identity={cms.identity}
-        onLoginSuccess={() => {
-          setIsAdminLoggedIn(true);
-          window.history.pushState({}, '', '/admin');
-          setCurrentPath('/admin');
+        onLoginSuccess={(profile, userIsAdmin) => {
+          if (userIsAdmin) {
+            setIsAdmin(true);
+            setIsAdminLoggedIn(true);
+            navigateToAdmin();
+          } else {
+            navigateToAccount();
+          }
         }}
         onReturnToSite={exitAdmin}
       />
     );
   }
 
-  if (isExplicitAdminDashboard) {
-    // If unauthenticated (and finished checking), redirect to /admin/login
-    if (!isAdminLoggedIn && !authChecking) {
-      window.history.replaceState({}, '', '/admin/login');
+  // ---------------------------------------------------------------------------
+  // Dedicated Route: Admin CMS Dashboard or Login Gate
+  // ---------------------------------------------------------------------------
+  if (currentTab === 'admin' || currentPath.startsWith('/admin') || window.location.hash === '#admin') {
+    // If not authenticated admin
+    if (!isAdmin || !isAdminLoggedIn) {
+      if (authChecking) {
+        return (
+          <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-xs">
+            Verifying Administrator Authentication...
+          </div>
+        );
+      }
+
+      // If logged in as non-admin user
+      if (currentUser && !isAdmin) {
+        return (
+          <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-slate-100">
+            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                <Shield className="w-7 h-7" />
+              </div>
+              <h2 className="text-xl font-bold text-white">Access Restricted</h2>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                You are currently signed in as <strong className="text-white">{currentUser.email}</strong>. The Administrator CMS is restricted to verified <strong className="text-white">{AUTHORIZED_ADMIN_EMAIL}</strong>.
+              </p>
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  onClick={navigateToAccount}
+                  className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl cursor-pointer"
+                >
+                  Go to My Account
+                </button>
+                <button
+                  onClick={exitAdmin}
+                  className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
+                >
+                  Return to Public Site
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Not logged in: Show Auth page
       return (
-        <AdminLoginPage
+        <AuthPage
+          initialMode="login"
           identity={cms.identity}
-          onLoginSuccess={() => {
-            setIsAdminLoggedIn(true);
-            window.history.pushState({}, '', '/admin');
-            setCurrentPath('/admin');
+          onLoginSuccess={(profile, userIsAdmin) => {
+            if (userIsAdmin) {
+              setIsAdmin(true);
+              setIsAdminLoggedIn(true);
+              navigateToAdmin();
+            } else {
+              navigateToAccount();
+            }
           }}
           onReturnToSite={exitAdmin}
         />
       );
     }
 
-    // Authenticated: Render Admin CMS Dashboard
+    // Authenticated Admin: Render Admin CMS
     return (
       <AdminCMS
         onExit={exitAdmin}
-        onLogout={() => {
-          setIsAdminLoggedIn(false);
-          navigateToAdminLogin();
-        }}
+        onLogout={handleLogout}
         onPreviewPublicSite={() => {
           setCurrentPath('/');
+          setCurrentTab('home');
           window.history.pushState({}, '', '/');
         }}
         onRefreshData={loadMasterData}
@@ -299,7 +380,7 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
       
       {/* Top Banner when an admin is previewing the live site */}
-      {isAdminLoggedIn && (
+      {isAdmin && (
         <div className="bg-slate-900 text-white text-xs px-4 py-1.5 flex items-center justify-between border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -315,11 +396,19 @@ export default function App() {
         </div>
       )}
 
-      {/* Universal Public Top Navigation Bar (NO admin links displayed to regular visitors) */}
+      {/* Universal Public Top Navigation Bar */}
       <Navbar
         currentTab={currentTab}
         onSelectTab={handleSelectTab}
         onRequestProject={handleOpenGeneralInquiry}
+        onOpenLogin={navigateToLogin}
+        onOpenRegister={navigateToRegister}
+        onOpenAccount={navigateToAccount}
+        onOpenAdminCMS={navigateToAdmin}
+        onLogout={handleLogout}
+        currentUser={currentUser}
+        userProfile={userProfile}
+        isAdmin={isAdmin}
         identity={cms.identity}
         navigation={cms.navigation}
       />
@@ -453,6 +542,7 @@ export default function App() {
             />
             <AboutView
               onRequestProject={handleOpenGeneralInquiry}
+              cms={cms}
             />
           </>
         )}
@@ -518,6 +608,36 @@ export default function App() {
               onRequestProject={handleOpenGeneralInquiry}
             />
           </>
+        )}
+
+        {/* My Account Protected View */}
+        {currentTab === 'account' && (
+          currentUser ? (
+            <AccountView
+              user={currentUser}
+              profile={userProfile}
+              isAdmin={isAdmin}
+              identity={cms.identity}
+              onLaunchAdminCMS={navigateToAdmin}
+              onRequestProject={handleOpenGeneralInquiry}
+              onLogout={handleLogout}
+              onProfileUpdated={(updated) => setUserProfile(updated)}
+            />
+          ) : (
+            <div className="py-20 text-center max-w-md mx-auto px-4">
+              <Shield className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <h2 className="text-xl font-bold text-slate-900">Sign in to Access Account</h2>
+              <p className="text-xs text-slate-500 mt-1 mb-4">
+                Please log in or register to view your verified profile and project management details.
+              </p>
+              <button
+                onClick={navigateToLogin}
+                className="px-5 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-sm hover:bg-blue-700 cursor-pointer"
+              >
+                Go to Login
+              </button>
+            </div>
+          )
         )}
 
         {currentTab === 'not-found' && (

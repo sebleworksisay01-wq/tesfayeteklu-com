@@ -249,7 +249,7 @@
       ],
       "shortDescription": "Multi-warehouse stock control system featuring barcode scanning, low-stock predictive replenishment, and automated vendor purchase orders.",
       "overview": "A mission-critical logistics and warehouse inventory application built to eliminate stock-outs, minimize holding overhead, and track bin locations.",
-      "businessProblem": "Over $120,000 in annual dead stock and recurring order fulfillment errors due to manual spreadsheet tallying and delayed receiving docks.",
+      "businessProblem": "Over 6,000,000 ETB in annual dead stock and recurring order fulfillment errors due to manual spreadsheet tallying and delayed receiving docks.",
       "proposedSolution": "Real-time perpetual inventory system with handheld barcode scanning support, supplier lead-time modeling, and batch expiry tracking.",
       "targetUsers": [
         "Warehouse Supervisors",
@@ -635,7 +635,7 @@
       "industry": "Transportation and Logistics",
       "projectDescription": "We need a custom freight tracking and dispatch dashboard to monitor our fleet of 65 intercity transport trucks, integrate IoT fuel sensors, and replace manual paper manifests.",
       "requiredFeatures": "GPS fleet tracking, IoT fuel monitor integration, driver trip logs, automated billing, SMS notification to cargo consignees.",
-      "budgetRange": "$15,000 - $30,000",
+      "budgetRange": "750,000 ETB - 1,500,000 ETB",
       "expectedCompletionDate": "2027-02-15",
       "preferredContactMethod": "Email",
       "status": "New",
@@ -661,7 +661,7 @@
       "industry": "Healthcare and Pharmaceuticals",
       "projectDescription": "Looking to develop a bilingual (English/Arabic) patient mobile application for booking 4 multi-specialty polyclinics in Dubai, with lab test result downloads and telehealth.",
       "requiredFeatures": "Doctor booking calendar, bilingual RTL support, patient medical records vault, insurance card scan, Apple Pay / Card payments.",
-      "budgetRange": "$25,000 - $50,000",
+      "budgetRange": "1,250,000 ETB - 2,500,000 ETB",
       "expectedCompletionDate": "2027-04-01",
       "preferredContactMethod": "Video Call",
       "status": "In Progress",
@@ -687,11 +687,11 @@
       "logoText": "TesfayeTech",
       "logoUrl": "",
       "faviconUrl": "",
-      "email": "info@tesfayetech.com",
-      "phone": "+1 (800) 456-7890 / +251 911 234 567",
-      "whatsapp": "+251 911 234 567",
-      "address": "Tesfaye Innovation Tower, Level 4, Tech Innovation Corridor",
-      "businessLocation": "Bole Innovation District, Addis Ababa & Remote Global",
+      "email": "info@tesfayeteklu.com",
+      "phone": "+251-932083373",
+      "whatsapp": "+251-932083373",
+      "address": "",
+      "businessLocation": "",
       "socialLinks": {
         "linkedin": "https://linkedin.com/company/tesfayetech",
         "github": "https://github.com/tesfayetech",
@@ -707,7 +707,7 @@
       "footer": {
         "summary": "Engineering high-performance websites, custom web applications, mobile platforms, and enterprise automation software designed to scale organizations.",
         "copyrightText": "© 2026 TesfayeTech Solutions. All rights reserved. Professional software engineering and digital transformation.",
-        "showTrustBadges": true
+        "showTrustBadges": false
       }
     },
     "navigation": {
@@ -720,46 +720,25 @@
           "order": 1
         },
         {
-          "id": "nav-websites",
-          "label": "Website Design",
-          "tab": "websites",
-          "visible": true,
-          "order": 2
-        },
-        {
-          "id": "nav-mobile",
-          "label": "Mobile Apps",
-          "tab": "mobile",
-          "visible": true,
-          "order": 3
-        },
-        {
-          "id": "nav-webapps",
-          "label": "Web Applications",
-          "tab": "webapps",
-          "visible": true,
-          "order": 4
-        },
-        {
           "id": "nav-services",
           "label": "Services",
           "tab": "services",
           "visible": true,
-          "order": 5
+          "order": 2
         },
         {
           "id": "nav-about",
           "label": "About Us",
           "tab": "about",
           "visible": true,
-          "order": 6
+          "order": 3
         },
         {
           "id": "nav-contact",
           "label": "Contact",
           "tab": "contact",
           "visible": true,
-          "order": 7
+          "order": 4
         }
       ],
       "ctaButtonText": "Request a Project",
@@ -777,11 +756,12 @@
       "sectionVisibility": {
         "hero": true,
         "metrics": true,
-        "categories": true,
+        "categories": false,
         "featuredDemos": true,
         "process": true,
         "whyUs": true,
         "testimonials": true,
+        "clients": false,
         "faq": true,
         "contactCta": true
       },
@@ -793,8 +773,8 @@
         "primaryCtaTab": "webapps",
         "secondaryCtaText": "Start Your Project",
         "secondaryCtaTab": "inquiry",
-        "imageUrl": "/src/assets/images/hero_tech_agency_1793079157707.jpg",
-        "imageCaption": "Software Architecture & Engineering · High-Throughput Cloud Deployment"
+        "imageUrl": "/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png",
+        "imageCaption": ""
       },
       "metrics": [
         {
@@ -1410,11 +1390,9 @@
         "UI/UX Product Design"
       ],
       "budgetOptions": [
-        "$3,000 - $7,000 (Standard Website / Small MVP)",
-        "$7,000 - $15,000 (Commercial Web / Mobile App)",
-        "$15,000 - $35,000 (Enterprise Portal / Multi-platform)",
-        "$35,000+ (Full Custom ERP / Large Scale)",
-        "Flexible / Needs Estimation"
+        "10,000 ETB - 50,000 ETB",
+        "50,000 ETB - 100,000 ETB",
+        "100,000 ETB - 150,000 ETB"
       ],
       "contactMethods": [
         "Email",
@@ -1693,10 +1671,72 @@
         "seoTitle": "Digital Transformation in Addis Ababa: Cut Operational Costs by 40% | TesfayeTech",
         "seoDescription": "Discover how business process automation, custom portals, and real-time inventory systems empower Ethiopian businesses to reduce overhead and scale rapidly."
       }
+    ],
+    "teamMembers": [
+      {
+        "id": "tm-1",
+        "name": "Tesfaye Teklu",
+        "role": "Founder & Principal Software Architect",
+        "bio": "Over 12 years of enterprise software architecture, full-stack systems engineering, and technology strategy across East Africa and international hubs.",
+        "photoUrl": "/assets/aistudio/tesimage-removebg-preview_af029598.png",
+        "department": "Leadership",
+        "socialLinks": {
+          "linkedin": "https://linkedin.com/in/tesfayeteklu",
+          "github": "https://github.com/tesfayeteklu",
+          "twitter": "https://twitter.com/tesfayeteklu"
+        },
+        "order": 1,
+        "published": true,
+        "createdAt": "2026-10-01T00:00:00Z"
+      },
+      {
+        "id": "tm-2",
+        "name": "Selamawit Bekele",
+        "role": "Head of Engineering & Full-Stack Lead",
+        "bio": "Specialist in high-throughput React systems, distributed Node.js backends, database query optimization, and resilient API gateways.",
+        "photoUrl": "",
+        "department": "Engineering",
+        "socialLinks": {
+          "linkedin": "https://linkedin.com/company/tesfayetech",
+          "github": "https://github.com/tesfayetech"
+        },
+        "order": 2,
+        "published": true,
+        "createdAt": "2026-10-05T00:00:00Z"
+      },
+      {
+        "id": "tm-3",
+        "name": "Dawit Haile",
+        "role": "Lead UI/UX Product Designer",
+        "bio": "Human-centered design leader crafting high-converting web applications, intuitive mobile experiences, and scalable design token systems.",
+        "photoUrl": "",
+        "department": "Design",
+        "socialLinks": {
+          "linkedin": "https://linkedin.com/company/tesfayetech"
+        },
+        "order": 3,
+        "published": true,
+        "createdAt": "2026-10-10T00:00:00Z"
+      },
+      {
+        "id": "tm-4",
+        "name": "Almaz Kebede",
+        "role": "DevOps & Cloud Systems Architect",
+        "bio": "Cloud automation specialist managing container orchestration, automated CI/CD pipelines, Zero-Trust network security, and 99.9% uptime SLAs.",
+        "photoUrl": "",
+        "department": "Engineering",
+        "socialLinks": {
+          "linkedin": "https://linkedin.com/company/tesfayetech",
+          "github": "https://github.com/tesfayetech"
+        },
+        "order": 4,
+        "published": true,
+        "createdAt": "2026-10-15T00:00:00Z"
+      }
     ]
   },
   "adminAccount": {
-    "email": "contactesfaye@gmail.com",
+    "email": "tesfayeteklufeyissa@gmail.com",
     "passwordHash": "f8f7976c618123dd46a5b049d19c7e921650c8a2319a6d37e744c3f81c6fa27d",
     "salt": "ba285a37b33e525c5059015ff7387a59",
     "isEmailVerified": true,

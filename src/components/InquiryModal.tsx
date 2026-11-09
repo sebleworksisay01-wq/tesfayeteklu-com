@@ -28,7 +28,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
   const [industry, setIndustry] = useState('Professional and Consulting Services');
   const [projectDescription, setProjectDescription] = useState('');
   const [requiredFeatures, setRequiredFeatures] = useState('');
-  const [budgetRange, setBudgetRange] = useState('$10,000 - $25,000');
+  const [budgetRange, setBudgetRange] = useState('10,000 ETB - 50,000 ETB');
   const [expectedCompletionDate, setExpectedCompletionDate] = useState('');
   const [preferredContactMethod, setPreferredContactMethod] = useState<'Email' | 'Phone' | 'WhatsApp' | 'Video Call'>('Email');
 
@@ -289,11 +289,9 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                     onChange={(e) => setBudgetRange(e.target.value)}
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                   >
-                    <option value="$3,000 - $7,000">$3,000 - $7,000 (Standard Website / Small MVP)</option>
-                    <option value="$7,000 - $15,000">$7,000 - $15,000 (Commercial Web / Mobile App)</option>
-                    <option value="$15,000 - $35,000">$15,000 - $35,000 (Enterprise Portal / Multi-platform)</option>
-                    <option value="$35,000+">$35,000+ (Full Custom ERP / Large Scale)</option>
-                    <option value="Flexible / Needs Estimation">Flexible / Needs Estimation</option>
+                    <option value="10,000 ETB - 50,000 ETB">10,000 ETB - 50,000 ETB</option>
+                    <option value="50,000 ETB - 100,000 ETB">50,000 ETB - 100,000 ETB</option>
+                    <option value="100,000 ETB - 150,000 ETB">100,000 ETB - 150,000 ETB</option>
                   </select>
                 </div>
                 <div>

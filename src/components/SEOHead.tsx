@@ -114,7 +114,6 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       description: identity?.subtagline || 'Engineering high-performance websites, mobile applications, and enterprise automation software in Addis Ababa, Ethiopia.',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: identity?.address || 'Tesfaye Innovation Tower, Level 4, Tech Innovation Corridor',
         addressLocality: 'Addis Ababa',
         addressRegion: 'Addis Ababa',
         postalCode: '1000',
@@ -122,7 +121,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       },
       contactPoint: {
         '@type': 'ContactPoint',
-        telephone: identity?.phone || '+251 911 234 567',
+        telephone: identity?.phone || '+251-932083373',
         contactType: 'customer support',
         areaServed: ['ET', 'US', 'GB', 'Global'],
         availableLanguage: ['English', 'Amharic']
@@ -143,13 +142,12 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       image: activeOgImage,
       '@id': `${CANONICAL_ORIGIN}/#business`,
       url: CANONICAL_ORIGIN,
-      telephone: identity?.phone || '+251 911 234 567',
+      telephone: identity?.phone || '+251-932083373',
       priceRange: '$$',
       currenciesAccepted: 'ETB, USD',
       paymentAccepted: 'Telebirr, Bank Transfer, Wire Transfer',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Tesfaye Innovation Tower, Level 4, Bole Innovation District',
         addressLocality: 'Addis Ababa',
         addressRegion: 'Addis Ababa',
         postalCode: '1000',

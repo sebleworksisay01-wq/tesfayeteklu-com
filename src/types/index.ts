@@ -20,10 +20,10 @@ export interface Project {
   overview: string;
   businessProblem: string;
   proposedSolution: string;
-  targetUsers: string[];
+  targetUsers: string[] | string;
   keyFeatures: string[];
   technologies: string[];
-  status: DemoStatus;
+  status: DemoStatus | string;
   featured: boolean;
   published: boolean;
   thumbnail: string;
@@ -38,6 +38,16 @@ export interface Project {
   sortOrder?: number;
   demoUrl?: string;
   interactiveSimulator?: 'clinic' | 'pos' | 'hrms' | 'hotel' | 'corporate' | 'ecommerce';
+  client?: string;
+  summary?: string;
+  tags?: string[];
+  features?: string[];
+  industry?: string;
+  completionDate?: string;
+  problem?: string;
+  solution?: string;
+  sourceCodeUrl?: string;
+  demoType?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,6 +77,12 @@ export interface Inquiry {
   status: InquiryStatus;
   internalNotes: { id: string; author: string; text: string; date: string }[];
   relatedProjectId?: string;
+  clientName?: string;
+  company?: string;
+  projectType?: string;
+  description?: string;
+  timeline?: string;
+  notes?: string;
   createdAt: string;
 }
 
@@ -90,4 +106,20 @@ export interface AdminUser {
   email: string;
   name: string;
   role: 'super_admin' | 'project_manager' | 'solutions_architect';
+}
+
+export interface UserProfile {
+  id?: string;
+  uid: string;
+  fullName: string;
+  displayName?: string;
+  name?: string;
+  email: string;
+  role: 'Administrator' | 'User' | 'admin' | 'editor' | 'user' | string;
+  emailVerified: boolean;
+  status?: string;
+  accountStatus: 'active' | 'suspended';
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt: string;
 }

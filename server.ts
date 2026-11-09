@@ -19,7 +19,7 @@ const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'store.json');
 
 // Strict single authorized administrator
-export const AUTHORIZED_ADMIN_EMAIL = 'contactesfaye@gmail.com';
+export const AUTHORIZED_ADMIN_EMAIL = 'tesfayeteklufeyissa@gmail.com';
 
 interface AdminAccountState {
   email: string;
@@ -73,10 +73,20 @@ function loadData(): AppData {
         adminAccount = createDefaultAdminAccount();
       }
 
+      const mergedCms: CmsConfig = parsed.cms ? {
+        ...DEFAULT_CMS_CONFIG,
+        ...parsed.cms,
+        aboutUs: parsed.cms.aboutUs || DEFAULT_CMS_CONFIG.aboutUs,
+        clients: parsed.cms.clients || DEFAULT_CMS_CONFIG.clients,
+        teamMembers: parsed.cms.teamMembers || DEFAULT_CMS_CONFIG.teamMembers,
+        mediaLibrary: parsed.cms.mediaLibrary || DEFAULT_CMS_CONFIG.mediaLibrary,
+        revisions: parsed.cms.revisions || DEFAULT_CMS_CONFIG.revisions,
+      } : DEFAULT_CMS_CONFIG;
+
       return {
         projects: parsed.projects || INITIAL_PROJECTS,
         inquiries: parsed.inquiries || INITIAL_INQUIRIES,
-        cms: parsed.cms || DEFAULT_CMS_CONFIG,
+        cms: mergedCms,
         adminAccount,
       };
     }
@@ -167,7 +177,7 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
     });
   }
 
-  // Strict check: Only contactesfaye@gmail.com is authorized
+  // Strict check: Only tesfayeteklufeyissa@gmail.com is authorized
   if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
     // Record failed attempt
     appData.adminAccount.failedLoginAttempts += 1;
