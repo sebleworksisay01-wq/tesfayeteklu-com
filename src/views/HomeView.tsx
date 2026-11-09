@@ -50,13 +50,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
        * 1. HERO SECTION
        * ============================================================*/}
       {visibility.hero !== false && (
-        <section className="relative pt-6 sm:pt-10">
+        <section className="relative pt-4 sm:pt-6 lg:pt-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               
               {/* Left Copy & Primary CTAs */}
-              <div className="lg:col-span-7 space-y-6">
+              <div className="lg:col-span-6 space-y-5 sm:space-y-6">
                 
                 {home?.hero?.badgeText && (
                   <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 tracking-wide uppercase">
@@ -64,8 +64,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </div>
                 )}
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1] text-balance">
-                  {home?.hero?.headline || 'We Design and Build Digital Solutions for Your Business.'}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15] text-balance">
+                  {home?.hero?.headline && home.hero.headline !== 'We Design and Build Digital Solutions for Your Business.' ? (
+                    home.hero.headline
+                  ) : (
+                    <>
+                      We Design and Build <span className="text-blue-600">Digital Solutions</span> for Your Business.
+                    </>
+                  )}
                 </h1>
 
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
@@ -99,7 +105,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 {/* Zero-Pill Quiet Trust Indicators */}
-                <div className="pt-4 flex items-center flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
+                <div className="pt-3 flex items-center flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>Interactive prototypes ready to test</span>
@@ -116,14 +122,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               </div>
 
-              {/* Right Hero Image Card */}
-              <div className="lg:col-span-5">
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-xl bg-slate-900 aspect-16/9 group">
+              {/* Right Hero Image Card (Positioned slightly higher, wider, and contained) */}
+              <div className="lg:col-span-6 lg:-mt-3">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 shadow-xl bg-white aspect-16/9 group hover:shadow-2xl transition-all duration-300">
                   <img
                     src={home?.hero?.imageUrl || '/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png'}
                     alt="TesfayeTech Digital Solutions"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-[1.01] transition-transform duration-500"
                   />
                   {home?.hero?.imageCaption && (
                     <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
