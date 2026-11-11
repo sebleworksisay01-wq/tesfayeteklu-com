@@ -23,7 +23,13 @@ import { auth, db } from '../lib/firebase';
 import { AdminUser, UserProfile } from '../types';
 import { sanitizeForFirestore } from './firestoreService';
 
-export const AUTHORIZED_ADMIN_EMAIL = 'tesfayeteklufeyissa@gmail.com';
+export const AUTHORIZED_ADMIN_EMAILS: string[] = ['contactesfaye@gmail.com', 'tesfayeteklufeyissa@gmail.com'];
+export const AUTHORIZED_ADMIN_EMAIL = 'contactesfaye@gmail.com';
+
+export function isAuthorizedAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return AUTHORIZED_ADMIN_EMAILS.includes(email.trim().toLowerCase());
+}
 
 export interface AppAuthState {
   user: User | null;
@@ -46,7 +52,7 @@ export function mapFirebaseUserToAdmin(user: User | null): AdminUser | null {
   if (!user || !user.email) return null;
   const normalizedEmail = user.email.trim().toLowerCase();
   
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
+  if (!isAuthorizedAdminEmail(normalizedEmail)) {
     return null;
   }
 
@@ -171,7 +177,7 @@ export async function registerUserWithFirebase(
   }
 
   // 3. Determine initial role
-  const isTargetAdmin = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+  const isTargetAdmin = isAuthorizedAdminEmail(normalizedEmail);
   const role: 'Administrator' | 'User' = isTargetAdmin ? 'Administrator' : 'User';
 
   // 4. Create user profile document in Firestore collection `users/{uid}`
@@ -255,7 +261,7 @@ export async function loginWithFirebase(
 
   // Fetch or create profile in Firestore
   let profile = await getUserProfile(refreshedUser.uid);
-  const isTargetAdmin = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+  const isTargetAdmin = isAuthorizedAdminEmail(normalizedEmail);
 
   if (!profile) {
     profile = {
@@ -367,7 +373,7 @@ export async function resendVerificationEmail(
   }
 
   // Scenario C: Target admin email
-  if (email && email.trim().toLowerCase() === AUTHORIZED_ADMIN_EMAIL) {
+  if (email && isAuthorizedAdminEmail(email)) {
     return {
       success: true,
       message: `To resend verification to ${email}, please enter your password on the login form or use password recovery.`,
@@ -389,7 +395,7 @@ export async function setupInitialAdminAccount(
 ): Promise<{ success: boolean; message: string }> {
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
+  if (!isAuthorizedAdminEmail(normalizedEmail)) {
     throw new Error('Administrator self-registration is permanently disabled for unauthorized addresses.');
   }
 
@@ -492,7 +498,7 @@ export function subscribeToAuthState(
 
     const isVerified = Boolean(user.emailVerified);
     const normalizedEmail = (user.email || '').trim().toLowerCase();
-    const isAdminAccount = normalizedEmail === AUTHORIZED_ADMIN_EMAIL;
+    const isAdminAccount = isAuthorizedAdminEmail(normalizedEmail);
     const adminUser = (isAdminAccount && isVerified) ? mapFirebaseUserToAdmin(user) : null;
 
     let profile: UserProfile | null = null;

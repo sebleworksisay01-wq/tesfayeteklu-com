@@ -607,6 +607,49 @@
   ],
   "inquiries": [
     {
+      "id": "inq-1794379289104",
+      "fullName": "Abebe Bikila",
+      "companyName": "Highland Tech",
+      "email": "abebe@highland.et",
+      "phone": "+251911223344",
+      "country": "Unspecified",
+      "solutionType": "Mobile Application Development",
+      "industry": "Professional and Consulting Services",
+      "projectDescription": "We need an iOS and Android app for parcel tracking integrated with Telebirr.",
+      "requiredFeatures": "Detailed in description",
+      "budgetRange": "Flexible / Discussion",
+      "expectedCompletionDate": "Flexible",
+      "preferredContactMethod": "Email",
+      "status": "New",
+      "internalNotes": [],
+      "createdAt": "2026-11-11T06:41:29.104Z"
+    },
+    {
+      "id": "cnt-1794379275118",
+      "fullName": "Tesfaye Test",
+      "companyName": "Contact Message",
+      "email": "visitor@example.com",
+      "phone": "Not provided",
+      "country": "Unspecified",
+      "solutionType": "Contact: Consultation Request",
+      "industry": "Direct Inquiry",
+      "projectDescription": "Hello TesfayeTech team, I would like to schedule a system architecture consultation.",
+      "requiredFeatures": "Subject: Consultation Request",
+      "budgetRange": "N/A",
+      "expectedCompletionDate": "N/A",
+      "preferredContactMethod": "Email",
+      "status": "New",
+      "internalNotes": [
+        {
+          "id": "note-1794379275118",
+          "author": "System (SMTP Gateway)",
+          "text": "Direct contact message submitted via /api/contact",
+          "date": "2026-11-11T06:41:15.118Z"
+        }
+      ],
+      "createdAt": "2026-11-11T06:41:15.118Z"
+    },
+    {
       "id": "inq-1793079802213",
       "fullName": "Test Client",
       "companyName": "Independent / Individual",
@@ -737,6 +780,13 @@
           "id": "nav-contact",
           "label": "Contact",
           "tab": "contact",
+          "visible": true,
+          "order": 5
+        },
+        {
+          "id": "nav-blog",
+          "label": "Blog",
+          "tab": "blog",
           "visible": true,
           "order": 4
         }
@@ -1103,28 +1153,6 @@
         "published": true
       },
       {
-        "id": "srv-8",
-        "title": "Cloud Deployment and Hosting Infrastructure",
-        "slug": "cloud-hosting",
-        "iconName": "Cloud",
-        "shortDescription": "Containerized deployments on Google Cloud, AWS, or Azure with auto-scaling, load balancing, SSL, and automated CI/CD pipelines.",
-        "fullDescription": "Containerized deployments (Docker, Kubernetes) on Google Cloud Platform, AWS, or Azure with auto-scaling, load balancing, and CDN caching.",
-        "benefits": [
-          "Zero-downtime rolling deployments via automated CI/CD pipelines",
-          "Elastic scaling that dynamically accommodates traffic spikes",
-          "Encrypted environment variable vault keeping keys safe"
-        ],
-        "deliverables": [
-          "Infrastructure-as-Code (IaC) configuration scripts",
-          "CI/CD GitHub Actions or GitLab pipeline setup",
-          "SSL certificate provisioning and domain routing",
-          "Cloud cost optimization audit"
-        ],
-        "quoteCtaText": "Request a Quote for Cloud Deployment",
-        "order": 8,
-        "published": true
-      },
-      {
         "id": "srv-9",
         "title": "Maintenance, Security, and Technical Support",
         "slug": "maintenance-support",
@@ -1143,7 +1171,7 @@
           "Quarterly architecture review and roadmap planning"
         ],
         "quoteCtaText": "Request a Quote for SLA Support",
-        "order": 9,
+        "order": 8,
         "published": true
       }
     ],
@@ -1672,6 +1700,155 @@
         "seoDescription": "Discover how business process automation, custom portals, and real-time inventory systems empower Ethiopian businesses to reduce overhead and scale rapidly."
       }
     ],
+    "aboutUs": {
+      "title": "Engineering High-Impact Digital Solutions for Growing Enterprises",
+      "subtitle": "Full-stack software engineering and digital transformation consultancy based in Addis Ababa, Ethiopia.",
+      "badgeText": "About TesfayeTech",
+      "mission": "To eliminate operational friction and technical debt for East African and global enterprises through high-performance, maintainable software architecture.",
+      "vision": "To be the preeminent software engineering partner across emerging markets, recognized globally for architectural integrity, flawless user experiences, and enduring business impact.",
+      "companyStory": "Founded on the principle that modern software should be an enduring asset rather than a continuous liability, TesfayeTech pairs rigorous full-stack engineering with human-centered product design. Whether architecting real-time telemetry platforms or enterprise healthcare systems, we deliver performant, cloud-native solutions that empower organizations to scale with confidence.",
+      "corePillars": [
+        {
+          "id": "cp-1",
+          "title": "Zero Vendor Lock-In",
+          "description": "Clean code, open standards, and 100% repository and database ownership transferred to every client.",
+          "iconName": "ShieldCheck"
+        },
+        {
+          "id": "cp-2",
+          "title": "Speed & Performance First",
+          "description": "Sub-second page loads, 60fps mobile interfaces, and optimized database queries built for resilient low-bandwidth operation.",
+          "iconName": "Zap"
+        },
+        {
+          "id": "cp-3",
+          "title": "Type-Safe Architecture",
+          "description": "Strict TypeScript across frontend, backend, and database models preventing runtime defects before production deployment.",
+          "iconName": "Code2"
+        },
+        {
+          "id": "cp-4",
+          "title": "Enterprise Security by Default",
+          "description": "Role-based access controls, encrypted credential vaults, and zero-trust cloud data pipelines that protect proprietary business workflows.",
+          "iconName": "Lock"
+        }
+      ],
+      "achievements": [
+        {
+          "id": "ach-1",
+          "metric": "18+",
+          "label": "Enterprise Sectors Engineered"
+        },
+        {
+          "id": "ach-2",
+          "metric": "99.9%",
+          "label": "Uptime SLA & Cloud Reliability"
+        },
+        {
+          "id": "ach-3",
+          "metric": "42M+ ETB",
+          "label": "Telemetry & Transactions Handled"
+        },
+        {
+          "id": "ach-4",
+          "metric": "100%",
+          "label": "Source Code & IP Ownership"
+        }
+      ],
+      "technicalCapabilities": [
+        {
+          "category": "Front-End & Mobile",
+          "technologies": "React 19, React Native, TypeScript, Tailwind CSS, Vite, Next.js"
+        },
+        {
+          "category": "Back-End & APIs",
+          "technologies": "Node.js, Express, Go, Python, RESTful Services, GraphQL, WebSockets"
+        },
+        {
+          "category": "Databases & Storage",
+          "technologies": "Cloud Firestore, PostgreSQL, Redis, Firebase Storage, MongoDB"
+        },
+        {
+          "category": "Cloud & DevOps",
+          "technologies": "Google Cloud Platform, Docker, Kubernetes, CI/CD Actions, Cloudflare"
+        }
+      ],
+      "updatedAt": "2026-11-11T06:41:11.607Z"
+    },
+    "clients": [
+      {
+        "id": "cli-1",
+        "name": "Awash Intercity Logistics",
+        "logoUrl": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://awashlogistics.example.com",
+        "industry": "Transportation and Logistics",
+        "partnershipType": "Client",
+        "featured": true,
+        "order": 1,
+        "published": true,
+        "createdAt": "2026-10-01T00:00:00Z"
+      },
+      {
+        "id": "cli-2",
+        "name": "Oasis Polyclinics Network",
+        "logoUrl": "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://oasisclinics.example.com",
+        "industry": "Healthcare and Pharmaceuticals",
+        "partnershipType": "Client",
+        "featured": true,
+        "order": 2,
+        "published": true,
+        "createdAt": "2026-10-05T00:00:00Z"
+      },
+      {
+        "id": "cli-3",
+        "name": "Dashen Commercial Hub",
+        "logoUrl": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://dashenhub.example.com",
+        "industry": "Retail and E-commerce",
+        "partnershipType": "Client",
+        "featured": true,
+        "order": 3,
+        "published": true,
+        "createdAt": "2026-10-10T00:00:00Z"
+      },
+      {
+        "id": "cli-4",
+        "name": "Telebirr Integrations Hub",
+        "logoUrl": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://telebirr.et",
+        "industry": "Financial Technology",
+        "partnershipType": "Tech Partner",
+        "featured": true,
+        "order": 4,
+        "published": true,
+        "createdAt": "2026-10-12T00:00:00Z"
+      },
+      {
+        "id": "cli-5",
+        "name": "Addis Agro-Commodities Export",
+        "logoUrl": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://addisagro.example.com",
+        "industry": "Agriculture and Agribusiness",
+        "partnershipType": "Client",
+        "featured": true,
+        "order": 5,
+        "published": true,
+        "createdAt": "2026-10-15T00:00:00Z"
+      },
+      {
+        "id": "cli-6",
+        "name": "Serengeti Vista Hospitality",
+        "logoUrl": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=240&q=80",
+        "websiteUrl": "https://serengetivista.example.com",
+        "industry": "Hospitality and Tourism",
+        "partnershipType": "Client",
+        "featured": true,
+        "order": 6,
+        "published": true,
+        "createdAt": "2026-10-18T00:00:00Z"
+      }
+    ],
     "teamMembers": [
       {
         "id": "tm-1",
@@ -1732,6 +1909,76 @@
         "order": 4,
         "published": true,
         "createdAt": "2026-10-15T00:00:00Z"
+      }
+    ],
+    "mediaLibrary": [
+      {
+        "id": "med-hero-banner",
+        "name": "TesfayeTech Digital Solutions Hero Banner",
+        "fileName": "TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png",
+        "fileUrl": "/assets/aistudio/TesfayeTech_Digital_Solutions_Banner_3a47ef3c.png",
+        "fileType": "image/png",
+        "fileSize": 1856031,
+        "folder": "branding",
+        "uploadedAt": "2026-11-11T06:41:11.607Z",
+        "altText": "TesfayeTech Digital Solutions Official Hero Banner"
+      },
+      {
+        "id": "med-1",
+        "name": "Hero Tech Agency Showcase",
+        "fileName": "hero_tech_agency_1793079157707.jpg",
+        "fileUrl": "/src/assets/images/hero_tech_agency_1793079157707.jpg",
+        "fileType": "image/jpeg",
+        "fileSize": 245000,
+        "folder": "branding",
+        "uploadedAt": "2026-10-20T10:00:00Z",
+        "altText": "TesfayeTech Software Architecture & Engineering"
+      },
+      {
+        "id": "med-2",
+        "name": "Website Design Showcase",
+        "fileName": "website_design_showcase_1793079157923.jpg",
+        "fileUrl": "/src/assets/images/website_design_showcase_1793079157923.jpg",
+        "fileType": "image/jpeg",
+        "fileSize": 310000,
+        "folder": "projects",
+        "uploadedAt": "2026-10-20T10:05:00Z",
+        "altText": "Corporate Website Design Showcase"
+      },
+      {
+        "id": "med-3",
+        "name": "Web App ERP Dashboard",
+        "fileName": "web_app_dashboard_1793079158006.jpg",
+        "fileUrl": "/src/assets/images/web_app_dashboard_1793079158006.jpg",
+        "fileType": "image/jpeg",
+        "fileSize": 285000,
+        "folder": "projects",
+        "uploadedAt": "2026-10-20T10:10:00Z",
+        "altText": "Enterprise Web Application and ERP Suite"
+      },
+      {
+        "id": "med-4",
+        "name": "Mobile App Mockup",
+        "fileName": "mobile_app_mockup_1793079158082.jpg",
+        "fileUrl": "/src/assets/images/mobile_app_mockup_1793079158082.jpg",
+        "fileType": "image/jpeg",
+        "fileSize": 260000,
+        "folder": "projects",
+        "uploadedAt": "2026-10-20T10:15:00Z",
+        "altText": "Cross-Platform Mobile Application Development"
+      }
+    ],
+    "revisions": [
+      {
+        "id": "rev-baseline",
+        "version": 1,
+        "timestamp": "2026-11-01T00:00:00Z",
+        "authorEmail": "tesfayeteklufeyissa@gmail.com",
+        "summary": "Initial System Deployment & Production CMS Baseline",
+        "snapshot": {
+          "version": 1,
+          "lastUpdated": "2026-11-01T00:00:00Z"
+        }
       }
     ]
   },

@@ -344,10 +344,32 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 // ----------------------------------------------------
-// Inquiries API (Firestore with Fallback)
+// Inquiries & Contact Forms API (DirectAdmin SMTP + Firestore)
 // ----------------------------------------------------
-export async function submitInquiry(inquiryData: Record<string, unknown>): Promise<{ success: boolean; message: string; inquiryId: string }> {
-  // Clean undefined properties before sending to Firestore or API
+export interface ContactMessagePayload {
+  fullName: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  honeypot?: string;
+}
+
+export async function submitContactMessage(payload: ContactMessagePayload): Promise<{ success: boolean; message: string }> {
+  const res = await fetch('/api/contact', {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to send message. Please try again or email admin@tesfayeteklu.com.');
+  }
+  return data;
+}
+
+export async function submitInquiry(inquiryData: Record<string, unknown>): Promise<{ success: boolean; message: string; inquiryId?: string }> {
+  // Clean undefined properties before sending
   const cleanData: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(inquiryData)) {
     if (value !== undefined) {
@@ -355,28 +377,39 @@ export async function submitInquiry(inquiryData: Record<string, unknown>): Promi
     }
   }
 
+  // 1. Post to /api/project-inquiry to trigger DirectAdmin SMTP notification to admin@tesfayeteklu.com
   try {
-    const res = await submitFirestoreInquiry(cleanData);
-    fetch('/api/inquiries', {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(cleanData),
-    }).catch(() => {});
-    return {
-      success: true,
-      message: 'Your project inquiry has been recorded. Our solutions team will review and contact you shortly.',
-      inquiryId: res.inquiryId,
-    };
-  } catch (err) {
-    console.warn('Firestore submitInquiry fallback:', err);
-    const res = await fetch('/api/inquiries', {
+    const res = await fetch('/api/project-inquiry', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(cleanData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry');
-    return data;
+    const serverResult = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(serverResult.error || 'Failed to submit inquiry');
+    }
+
+    // Mirror to Firestore for real-time CRM tracking if available
+    try {
+      await submitFirestoreInquiry(cleanData);
+    } catch (fsErr) {
+      console.warn('Firestore mirror inquiry notice:', fsErr);
+    }
+
+    return serverResult;
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.warn('Direct server project-inquiry failed, attempting Firestore fallback:', errMsg);
+    try {
+      const fsRes = await submitFirestoreInquiry(cleanData);
+      return {
+        success: true,
+        message: 'Your project inquiry has been recorded. Our solutions team will review and contact you shortly.',
+        inquiryId: fsRes.inquiryId,
+      };
+    } catch {
+      throw new Error(errMsg || 'Failed to submit project inquiry');
+    }
   }
 }
 

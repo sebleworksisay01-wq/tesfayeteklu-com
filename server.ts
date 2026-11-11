@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import { createServer as createViteServer } from 'vite';
 import { Project, Inquiry } from './src/types';
 import { CmsConfig, CustomPage, BlogArticle } from './src/types/cms';
@@ -18,8 +19,14 @@ app.use(express.json({ limit: '15mb' }));
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'store.json');
 
-// Strict single authorized administrator
-export const AUTHORIZED_ADMIN_EMAIL = 'tesfayeteklufeyissa@gmail.com';
+// Strict authorized administrators
+export const AUTHORIZED_ADMIN_EMAILS: string[] = ['contactesfaye@gmail.com', 'tesfayeteklufeyissa@gmail.com'];
+export const AUTHORIZED_ADMIN_EMAIL = 'contactesfaye@gmail.com';
+
+export function isAuthorizedAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return AUTHORIZED_ADMIN_EMAILS.includes(email.trim().toLowerCase());
+}
 
 interface AdminAccountState {
   email: string;
@@ -143,7 +150,7 @@ function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
   const session = activeSessions.get(token);
   
   // Strictly verify session belongs to the authorized admin
-  if (!session || session.email !== AUTHORIZED_ADMIN_EMAIL) {
+  if (!session || !isAuthorizedAdminEmail(session.email)) {
     return res.status(401).json({ error: 'Unauthorized: Session invalid or expired' });
   }
   next();
@@ -177,8 +184,8 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
     });
   }
 
-  // Strict check: Only tesfayeteklufeyissa@gmail.com is authorized
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
+  // Strict check: Only authorized admin addresses
+  if (!isAuthorizedAdminEmail(normalizedEmail)) {
     // Record failed attempt
     appData.adminAccount.failedLoginAttempts += 1;
     if (appData.adminAccount.failedLoginAttempts >= 5) {
@@ -250,13 +257,13 @@ app.get('/api/auth/verify', (req: Request, res: Response) => {
   const token = authHeader.split(' ')[1];
   const session = activeSessions.get(token);
   
-  if (session && session.email === AUTHORIZED_ADMIN_EMAIL) {
+  if (session && isAuthorizedAdminEmail(session.email)) {
     return res.json({
       authenticated: true,
       user: {
         id: 'admin-01',
-        email: AUTHORIZED_ADMIN_EMAIL,
-        name: 'Tesfaye',
+        email: session.email,
+        name: 'Tesfaye Teklu',
         role: 'super_admin',
         isEmailVerified: true,
       },
@@ -289,7 +296,7 @@ app.post('/api/auth/forgot-password', (req: Request, res: Response) => {
     message: 'If an account is associated with this email address, password reset instructions have been dispatched.',
   };
 
-  if (normalizedEmail === AUTHORIZED_ADMIN_EMAIL) {
+  if (isAuthorizedAdminEmail(normalizedEmail)) {
     // Generate secure 6-digit reset code and token
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const resetToken = crypto.randomBytes(24).toString('hex');
@@ -325,7 +332,7 @@ app.post('/api/auth/reset-password', (req: Request, res: Response) => {
   }
 
   const normalizedEmail = String(email).trim().toLowerCase();
-  if (normalizedEmail !== AUTHORIZED_ADMIN_EMAIL) {
+  if (!isAuthorizedAdminEmail(normalizedEmail)) {
     return res.status(400).json({ error: 'Invalid or expired password reset request' });
   }
 
@@ -697,9 +704,349 @@ app.get('/api/industries', (_req: Request, res: Response) => {
 });
 
 // ----------------------------------------------------
-// Project Inquiry Endpoints
+// DirectAdmin SMTP Email Configuration & Helpers
 // ----------------------------------------------------
-app.post('/api/inquiries', (req: Request, res: Response) => {
+const SMTP_HOST = process.env.SMTP_HOST || 'mail.tesfayeteklu.com';
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465', 10);
+const SMTP_SECURE = process.env.SMTP_SECURE !== 'false' && (process.env.SMTP_SECURE === 'true' || SMTP_PORT === 465);
+const SMTP_USER = process.env.SMTP_USER || 'admin@tesfayeteklu.com';
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD || '';
+const CONTACT_RECEIVER = process.env.CONTACT_RECEIVER || 'admin@tesfayeteklu.com';
+const SENDER_NAME = 'TesfayeTech Website';
+const SENDER_EMAIL = SMTP_USER;
+
+// Rate limiting & duplicate spam protection
+interface RateLimitRecord {
+  count: number;
+  resetAt: number;
+}
+const ipRateLimits = new Map<string, RateLimitRecord>();
+const recentSubmissions = new Map<string, number>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = ipRateLimits.get(ip);
+  if (!record || now > record.resetAt) {
+    ipRateLimits.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 }); // 15 mins
+    return true;
+  }
+  if (record.count >= 12) {
+    return false;
+  }
+  record.count++;
+  return true;
+}
+
+function isDuplicateSubmission(fingerprint: string): boolean {
+  const now = Date.now();
+  const lastTime = recentSubmissions.get(fingerprint);
+  if (lastTime && now - lastTime < 30 * 1000) {
+    return true;
+  }
+  recentSubmissions.set(fingerprint, now);
+  if (recentSubmissions.size > 200) {
+    for (const [k, time] of recentSubmissions.entries()) {
+      if (now - time > 60 * 1000) recentSubmissions.delete(k);
+    }
+  }
+  return false;
+}
+
+function escapeHtml(str: string): string {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+async function sendSmtpEmail({
+  subject,
+  html,
+  text,
+  replyTo,
+}: {
+  subject: string;
+  html: string;
+  text: string;
+  replyTo: string;
+}): Promise<{ success: boolean; error?: string }> {
+  // If SMTP password is not set or is placeholder, log for dev/staging
+  if (!SMTP_PASSWORD || SMTP_PASSWORD === 'YOUR_EMAIL_PASSWORD') {
+    console.warn(`[SMTP Alert] Outgoing email "${subject}" queued for ${CONTACT_RECEIVER}. Set SMTP_PASSWORD in DirectAdmin / .env for live server delivery.`);
+    console.log(`[SMTP Details] To: ${CONTACT_RECEIVER} | Reply-To: ${replyTo}`);
+    if (isProduction && process.env.STRICT_SMTP === 'true') {
+      return {
+        success: false,
+        error: 'SMTP email server password is not configured on the production host.',
+      };
+    }
+    return { success: true };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_SECURE,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+    });
+
+    await transporter.sendMail({
+      from: `"${SENDER_NAME}" <${SENDER_EMAIL}>`,
+      to: CONTACT_RECEIVER,
+      replyTo,
+      subject,
+      text,
+      html,
+    });
+
+    console.log(`[SMTP Success] Email delivered to ${CONTACT_RECEIVER} ("${subject}")`);
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[SMTP Error] Delivery failed to ${CONTACT_RECEIVER}:`, message);
+    return { success: false, error: message };
+  }
+}
+
+function generateProjectInquiryHtml(data: {
+  fullName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  solutionType: string;
+  budgetRange: string;
+  expectedCompletionDate: string;
+  projectDescription: string;
+  requiredFeatures?: string;
+  submittedAt: string;
+  ip: string;
+}): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Project Inquiry – ${escapeHtml(data.fullName)}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9;padding:30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e2e8f0;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:32px 30px;border-bottom:3px solid #2563eb;">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <span style="font-size:11px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px;">TesfayeTech Solutions</span>
+                    <h1 style="margin:0;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">New Project Inquiry</h1>
+                  </td>
+                  <td align="right" valign="top">
+                    <span style="background-color:#2563eb;color:#ffffff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;">Inquiry</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 30px 10px 30px;">
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#334155;">
+                You have received a new project discovery inquiry from <strong>${escapeHtml(data.fullName)}</strong> through <a href="https://tesfayeteklu.com" style="color:#2563eb;text-decoration:none;">tesfayeteklu.com</a>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:10px 30px;">
+              <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;">
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;width:38%;">Full Name:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;font-weight:700;">${escapeHtml(data.fullName)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Email Address:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#2563eb;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}" style="color:#2563eb;text-decoration:none;">${escapeHtml(data.email)}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Phone Number:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;">${escapeHtml(data.phone || 'Not provided')}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Company / Org:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;">${escapeHtml(data.companyName || 'Individual')}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Service Interested In:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;font-weight:600;">${escapeHtml(data.solutionType || 'General Consultation')}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Target Budget:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#047857;font-weight:700;">${escapeHtml(data.budgetRange || 'Flexible')}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Project Timeline:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;">${escapeHtml(data.expectedCompletionDate || 'Flexible')}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:15px 30px;">
+              <h3 style="margin:0 0 8px 0;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#475569;font-weight:700;">Project Scope & Description:</h3>
+              <div style="background-color:#f1f5f9;border-left:4px solid #2563eb;padding:14px 16px;border-radius:4px;font-size:13px;line-height:1.6;color:#1e293b;white-space:pre-wrap;">${escapeHtml(data.projectDescription)}</div>
+            </td>
+          </tr>
+          ${data.requiredFeatures ? `
+          <tr>
+            <td style="padding:0 30px 15px 30px;">
+              <h3 style="margin:0 0 8px 0;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#475569;font-weight:700;">Required Features:</h3>
+              <div style="background-color:#f8fafc;border:1px solid #e2e8f0;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.5;color:#334155;">${escapeHtml(data.requiredFeatures)}</div>
+            </td>
+          </tr>
+          ` : ''}
+          <tr>
+            <td style="padding:10px 30px 24px 30px;text-align:center;">
+              <a href="mailto:${escapeHtml(data.email)}?subject=Re:%20TesfayeTech%20Project%20Inquiry" style="display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:12px 28px;border-radius:10px;">Reply to ${escapeHtml(data.fullName)}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:18px 30px;text-align:center;font-size:11px;color:#64748b;line-height:1.6;">
+              <p style="margin:0 0 4px 0;"><strong>TesfayeTech Solutions</strong> • Professional Software Engineering</p>
+              <p style="margin:0 0 4px 0;">Website: <a href="https://tesfayeteklu.com" style="color:#2563eb;text-decoration:none;">https://tesfayeteklu.com</a> | Recipient: ${CONTACT_RECEIVER}</p>
+              <p style="margin:0;color:#94a3b8;font-size:10px;">Submitted: ${escapeHtml(data.submittedAt)} • Client IP: ${escapeHtml(data.ip)}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+function generateContactMessageHtml(data: {
+  fullName: string;
+  email: string;
+  subject: string;
+  message: string;
+  submittedAt: string;
+  ip: string;
+}): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Contact Message – ${escapeHtml(data.fullName)}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9;padding:30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #e2e8f0;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:32px 30px;border-bottom:3px solid #2563eb;">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <span style="font-size:11px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px;">TesfayeTech Solutions</span>
+                    <h1 style="margin:0;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Website Contact Message</h1>
+                  </td>
+                  <td align="right" valign="top">
+                    <span style="background-color:#059669;color:#ffffff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;">Contact</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 30px 10px 30px;">
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#334155;">
+                You have received a new contact message from <strong>${escapeHtml(data.fullName)}</strong> through <a href="https://tesfayeteklu.com" style="color:#2563eb;text-decoration:none;">tesfayeteklu.com</a>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:10px 30px;">
+              <table width="100%" cellspacing="0" cellpadding="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;">
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;width:35%;">Sender Name:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;font-weight:700;">${escapeHtml(data.fullName)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Email Address:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#2563eb;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}" style="color:#2563eb;text-decoration:none;">${escapeHtml(data.email)}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:7px 10px;font-size:12px;color:#64748b;font-weight:600;">Subject:</td>
+                  <td style="padding:7px 10px;font-size:13px;color:#0f172a;font-weight:700;">${escapeHtml(data.subject)}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:15px 30px;">
+              <h3 style="margin:0 0 8px 0;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#475569;font-weight:700;">Message:</h3>
+              <div style="background-color:#f1f5f9;border-left:4px solid #2563eb;padding:16px;border-radius:4px;font-size:13px;line-height:1.6;color:#1e293b;white-space:pre-wrap;">${escapeHtml(data.message)}</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:10px 30px 24px 30px;text-align:center;">
+              <a href="mailto:${escapeHtml(data.email)}?subject=Re:%20${encodeURIComponent(data.subject)}" style="display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:12px 28px;border-radius:10px;">Reply to ${escapeHtml(data.fullName)}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:18px 30px;text-align:center;font-size:11px;color:#64748b;line-height:1.6;">
+              <p style="margin:0 0 4px 0;"><strong>TesfayeTech Solutions</strong> • Professional Software Engineering</p>
+              <p style="margin:0 0 4px 0;">Website: <a href="https://tesfayeteklu.com" style="color:#2563eb;text-decoration:none;">https://tesfayeteklu.com</a> | Recipient: ${CONTACT_RECEIVER}</p>
+              <p style="margin:0;color:#94a3b8;font-size:10px;">Submitted: ${escapeHtml(data.submittedAt)} • Client IP: ${escapeHtml(data.ip)}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+// ----------------------------------------------------
+// Project Inquiry Endpoint Handler (POST /api/project-inquiry & POST /api/inquiries)
+// ----------------------------------------------------
+async function handleProjectInquirySubmission(req: Request, res: Response) {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+
+  // Honeypot spam trap
+  if (req.body.honeypot || req.body._gotcha || req.body.website) {
+    return res.status(200).json({
+      success: true,
+      message: 'Your inquiry has been received.',
+      inquiryId: 'inq-hp-' + Date.now(),
+    });
+  }
+
+  // Rate Limiting
+  if (!checkRateLimit(clientIp)) {
+    return res.status(429).json({
+      error: 'Too many submissions from this connection. Please wait 15 minutes before submitting again.',
+    });
+  }
+
   const {
     fullName,
     companyName,
@@ -717,25 +1064,48 @@ app.post('/api/inquiries', (req: Request, res: Response) => {
   } = req.body;
 
   // Validation
-  if (!fullName || !email || !projectDescription) {
-    return res.status(400).json({ error: 'Full name, email, and project description are required.' });
+  if (!fullName || !String(fullName).trim()) {
+    return res.status(400).json({ error: 'Please enter your full name.' });
   }
 
+  if (!email || !String(email).trim()) {
+    return res.status(400).json({ error: 'Please enter your email address.' });
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: 'Please provide a valid email address.' });
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid email address format.' });
   }
 
+  if (!projectDescription || !String(projectDescription).trim()) {
+    return res.status(400).json({ error: 'Please provide a project description or summary of your requirements.' });
+  }
+
+  const cleanName = String(fullName).trim();
+  const cleanDesc = String(projectDescription).trim();
+
+  // Duplicate Submission Prevention
+  const fingerprint = `inquiry:${cleanEmail}:${cleanName}:${cleanDesc.slice(0, 40)}`;
+  if (isDuplicateSubmission(fingerprint)) {
+    return res.status(429).json({
+      error: 'Duplicate submission detected. Your inquiry has already been received and queued for review.',
+    });
+  }
+
+  const submittedAt = new Date().toISOString();
+
+  // Record into persistent store for Admin CMS
   const newInquiry: Inquiry = {
     id: 'inq-' + Date.now(),
-    fullName: String(fullName).trim(),
+    fullName: cleanName,
     companyName: companyName ? String(companyName).trim() : 'Independent / Individual',
-    email: String(email).trim().toLowerCase(),
+    email: cleanEmail,
     phone: phone ? String(phone).trim() : 'Not provided',
     country: country ? String(country).trim() : 'Unspecified',
     solutionType: solutionType || 'General Consultation',
     industry: industry || 'Professional and Consulting Services',
-    projectDescription: String(projectDescription).trim(),
+    projectDescription: cleanDesc,
     requiredFeatures: requiredFeatures ? String(requiredFeatures).trim() : 'Detailed in description',
     budgetRange: budgetRange || 'Flexible / Discussion',
     expectedCompletionDate: expectedCompletionDate || 'Flexible',
@@ -743,16 +1113,201 @@ app.post('/api/inquiries', (req: Request, res: Response) => {
     status: 'New',
     internalNotes: [],
     relatedProjectId,
-    createdAt: new Date().toISOString(),
+    createdAt: submittedAt,
   };
 
   appData.inquiries.unshift(newInquiry);
   saveData(appData);
 
+  // Send DirectAdmin SMTP Email Notification to admin@tesfayeteklu.com
+  const emailHtml = generateProjectInquiryHtml({
+    fullName: cleanName,
+    email: cleanEmail,
+    phone: newInquiry.phone,
+    companyName: newInquiry.companyName,
+    solutionType: newInquiry.solutionType,
+    budgetRange: newInquiry.budgetRange,
+    expectedCompletionDate: newInquiry.expectedCompletionDate,
+    projectDescription: cleanDesc,
+    requiredFeatures: newInquiry.requiredFeatures,
+    submittedAt,
+    ip: clientIp,
+  });
+
+  const emailText = `
+New Project Inquiry – ${cleanName}
+----------------------------------------
+Full Name: ${cleanName}
+Email: ${cleanEmail}
+Phone: ${newInquiry.phone}
+Company: ${newInquiry.companyName}
+Service: ${newInquiry.solutionType}
+Budget: ${newInquiry.budgetRange}
+Timeline: ${newInquiry.expectedCompletionDate}
+
+Project Scope & Description:
+${cleanDesc}
+
+Required Features:
+${newInquiry.requiredFeatures}
+
+Submitted: ${submittedAt} (UTC)
+Website: https://tesfayeteklu.com
+  `.trim();
+
+  const emailResult = await sendSmtpEmail({
+    subject: `New Project Inquiry – ${cleanName}`,
+    html: emailHtml,
+    text: emailText,
+    replyTo: cleanEmail,
+  });
+
+  if (!emailResult.success) {
+    return res.status(502).json({
+      error: `Email notification delivery failed: ${emailResult.error || 'SMTP server error'}. Please try again or email ${CONTACT_RECEIVER} directly.`,
+    });
+  }
+
   res.status(201).json({
     success: true,
-    message: appData.cms.contactForm.confirmationMessage || 'Your project inquiry has been received. Our solutions team will review and contact you within 24 business hours.',
+    message: 'Your project inquiry has been received and delivered to admin@tesfayeteklu.com. Our solutions team will review and contact you within 24 business hours.',
     inquiryId: newInquiry.id,
+  });
+}
+
+app.post('/api/project-inquiry', handleProjectInquirySubmission);
+app.post('/api/inquiries', handleProjectInquirySubmission);
+
+// ----------------------------------------------------
+// Contact Form Endpoint (POST /api/contact)
+// ----------------------------------------------------
+app.post('/api/contact', async (req: Request, res: Response) => {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+
+  // Honeypot spam trap
+  if (req.body.honeypot || req.body._gotcha || req.body.website) {
+    return res.status(200).json({
+      success: true,
+      message: 'Your message has been received.',
+    });
+  }
+
+  // Rate Limiting
+  if (!checkRateLimit(clientIp)) {
+    return res.status(429).json({
+      error: 'Too many messages submitted from this connection. Please wait 15 minutes before submitting again.',
+    });
+  }
+
+  const { fullName, email, subject, message } = req.body;
+
+  // Validation
+  if (!fullName || !String(fullName).trim()) {
+    return res.status(400).json({ error: 'Please enter your full name.' });
+  }
+
+  if (!email || !String(email).trim()) {
+    return res.status(400).json({ error: 'Please enter your email address.' });
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid email address format.' });
+  }
+
+  if (!subject || !String(subject).trim()) {
+    return res.status(400).json({ error: 'Please enter a subject line for your message.' });
+  }
+
+  if (!message || !String(message).trim()) {
+    return res.status(400).json({ error: 'Please enter your message.' });
+  }
+
+  const cleanName = String(fullName).trim();
+  const cleanSubject = String(subject).trim();
+  const cleanMessage = String(message).trim();
+
+  // Duplicate submission check
+  const fingerprint = `contact:${cleanEmail}:${cleanName}:${cleanMessage.slice(0, 40)}`;
+  if (isDuplicateSubmission(fingerprint)) {
+    return res.status(429).json({
+      error: 'Duplicate message detected. Your contact request has already been delivered.',
+    });
+  }
+
+  const submittedAt = new Date().toISOString();
+
+  // Save into appData inquiries as a Contact Message so it appears in the CMS dashboard
+  const contactInquiry: Inquiry = {
+    id: 'cnt-' + Date.now(),
+    fullName: cleanName,
+    companyName: 'Contact Message',
+    email: cleanEmail,
+    phone: 'Not provided',
+    country: 'Unspecified',
+    solutionType: `Contact: ${cleanSubject}`,
+    industry: 'Direct Inquiry',
+    projectDescription: cleanMessage,
+    requiredFeatures: `Subject: ${cleanSubject}`,
+    budgetRange: 'N/A',
+    expectedCompletionDate: 'N/A',
+    preferredContactMethod: 'Email',
+    status: 'New',
+    internalNotes: [
+      {
+        id: `note-${Date.now()}`,
+        author: 'System (SMTP Gateway)',
+        text: 'Direct contact message submitted via /api/contact',
+        date: submittedAt,
+      },
+    ],
+    createdAt: submittedAt,
+  };
+
+  appData.inquiries.unshift(contactInquiry);
+  saveData(appData);
+
+  // Send DirectAdmin SMTP Email Notification to admin@tesfayeteklu.com
+  const emailHtml = generateContactMessageHtml({
+    fullName: cleanName,
+    email: cleanEmail,
+    subject: cleanSubject,
+    message: cleanMessage,
+    submittedAt,
+    ip: clientIp,
+  });
+
+  const emailText = `
+Website Contact Message – ${cleanName}
+----------------------------------------
+From: ${cleanName}
+Email: ${cleanEmail}
+Subject: ${cleanSubject}
+
+Message:
+${cleanMessage}
+
+Submitted: ${submittedAt} (UTC)
+Website: https://tesfayeteklu.com
+  `.trim();
+
+  const emailResult = await sendSmtpEmail({
+    subject: `Website Contact Message – ${cleanName}`,
+    html: emailHtml,
+    text: emailText,
+    replyTo: cleanEmail,
+  });
+
+  if (!emailResult.success) {
+    return res.status(502).json({
+      error: `Email delivery failed: ${emailResult.error || 'SMTP server error'}. Please try again or reach out to ${CONTACT_RECEIVER} directly.`,
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Your message has been sent successfully to admin@tesfayeteklu.com. Thank you for reaching out!',
   });
 });
 
@@ -838,6 +1393,9 @@ app.post('/api/system/reset', requireAdminAuth, (_req: Request, res: Response) =
 // ----------------------------------------------------
 app.get('/robots.txt', (_req: Request, res: Response) => {
   res.type('text/plain');
+  if (appData.cms.seo?.searchEngines?.robotsTxtContent?.trim()) {
+    return res.send(appData.cms.seo.searchEngines.robotsTxtContent.trim() + '\n');
+  }
   res.send(`# Robots.txt for TesfayeTech (https://tesfayeteklu.com)
 # Professional Software Development & Digital Solutions Company in Ethiopia
 
@@ -983,6 +1541,18 @@ function injectCrawlerMetadata(html: string, reqUrl: string): string {
   html = html.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${title}" />`);
   html = html.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${description}" />`);
   html = html.replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="${ogImage}" />`);
+
+  // Search Engine Verification Tags (Google Search Console & Bing Webmaster Tools)
+  const googleTag = appData.cms.seo?.searchEngines?.googleVerificationTag || appData.cms.seo?.googleSearchConsoleVerification;
+  if (googleTag && !html.includes('google-site-verification')) {
+    const cleanTag = googleTag.includes('content=') ? (googleTag.match(/content=["'](.*?)["']/)?.[1] || googleTag) : googleTag.replace(/^google-site-verification=/, '');
+    html = html.replace('</head>', `  <meta name="google-site-verification" content="${cleanTag}" />\n</head>`);
+  }
+  const bingTag = appData.cms.seo?.searchEngines?.bingVerificationTag || appData.cms.seo?.bingWebmasterVerification;
+  if (bingTag && !html.includes('msvalidate.01')) {
+    const cleanBing = bingTag.includes('content=') ? (bingTag.match(/content=["'](.*?)["']/)?.[1] || bingTag) : bingTag;
+    html = html.replace('</head>', `  <meta name="msvalidate.01" content="${cleanBing}" />\n</head>`);
+  }
 
   return html;
 }

@@ -317,10 +317,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           <span>Return to Public Website</span>
         </button>
 
-        <div className="flex items-center gap-2 text-2xs text-slate-400 uppercase tracking-wider font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Firebase Authentication Active</span>
-        </div>
       </header>
 
       {/* Main Form Container */}
@@ -399,7 +395,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                 {mode === 'login' 
                   ? 'Access your projects, client dashboard, and administration tools.'
-                  : 'Join TesfayeTech to collaborate, track project deliveries, and request proposals.'}
+                  : 'Enter your credentials to create your user account.'}
               </p>
 
               {/* Mode Toggle Tabs */}
@@ -802,26 +798,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               </div>
             )}
 
-            {/* Bottom Card Footer Security Info */}
-            <div className="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-2xs text-slate-500">
-              <div className="flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Mandatory Email Verification Enforced</span>
-              </div>
-              <span className="text-slate-400 font-mono text-3xs">
-                Admin: {AUTHORIZED_ADMIN_EMAIL.split('@')[0]}
-              </span>
-            </div>
-
           </div>
-
-          {/* Subcard Informational Note */}
-          <div className="mt-4 p-3.5 rounded-2xl bg-slate-900/50 border border-slate-800/60 text-center">
-            <p className="text-2xs text-slate-400 leading-relaxed">
-              New accounts require email verification before system access is granted. Administrator privileges are strictly reserved for verified <span className="text-slate-200 font-medium">{AUTHORIZED_ADMIN_EMAIL}</span>.
-            </p>
-          </div>
-
         </div>
       </main>
 

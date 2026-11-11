@@ -205,6 +205,9 @@ export interface MediaItem {
   uploadedAt: string;
   uploadedBy?: string;
   altText?: string;
+  caption?: string;
+  dimensions?: string;
+  assignedSection?: string;
 }
 
 export interface ContentRevision {
@@ -350,10 +353,22 @@ export interface SeoPageConfig {
   title: string;
   metaDescription: string;
   keywords: string;
+  focusKeyword?: string;
+  searchEngineTitle?: string;
   canonicalUrl: string;
   robots: 'index, follow' | 'noindex, nofollow';
+  ogTitle?: string;
+  ogDescription?: string;
   ogImage?: string;
   ogType?: 'website' | 'article';
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  imageAltText?: string;
+  structuredDataType?: string;
+  structuredDataJson?: string;
+  status?: 'published' | 'draft';
+  targetType?: 'page' | 'service' | 'portfolio' | 'blog';
 }
 
 export interface BlogArticle {
@@ -373,6 +388,24 @@ export interface BlogArticle {
   featured: boolean;
   seoTitle?: string;
   seoDescription?: string;
+  focusKeyword?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+export interface SearchEngineIntegrationSettings {
+  googlePropertyUrl: string;
+  googleVerificationTag: string;
+  googleDnsInstructions: string;
+  googleVerificationStatus: 'verified' | 'pending' | 'unverified';
+  googleSitemapSubmissionUrl: string;
+  bingVerificationTag: string;
+  bingDnsInstructions: string;
+  bingVerificationStatus: 'verified' | 'pending' | 'unverified';
+  bingSitemapSubmissionUrl: string;
+  customRobotsTxt?: string;
+  robotsTxtContent?: string;
+  lastSitemapPing?: string;
 }
 
 export interface SeoSettings {
@@ -385,8 +418,22 @@ export interface SeoSettings {
   robots?: 'index, follow' | 'noindex, nofollow';
   googleSearchConsoleVerification?: string;
   bingVerification?: string;
+  bingWebmasterVerification?: string;
   googleAnalyticsId?: string;
   pages?: SeoPageConfig[];
+  searchEngines?: SearchEngineIntegrationSettings;
+  lastUpdated?: string;
+}
+
+export interface AuditLogItem {
+  id: string;
+  action: 'CONTENT_UPDATE' | 'MEDIA_UPLOAD' | 'MEDIA_DELETE' | 'SEO_UPDATE' | 'PAGE_PUBLISH' | 'SETTINGS_CHANGE' | 'SECURITY_UPDATE' | 'BACKUP_RESTORE';
+  entityType: string;
+  entityId?: string;
+  entityName?: string;
+  details: string;
+  authorEmail: string;
+  timestamp: string;
 }
 
 export interface CmsConfig {
@@ -406,6 +453,7 @@ export interface CmsConfig {
   contactForm: ContactFormConfig;
   seo: SeoSettings;
   blogArticles?: BlogArticle[];
+  auditLogs?: AuditLogItem[];
   version: number;
   lastUpdated: string;
 }

@@ -89,7 +89,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
         ...(prefillProject?.id ? { relatedProjectId: prefillProject.id } : {}),
       });
 
-      setSuccessData({ message: res.message, inquiryId: res.inquiryId });
+      setSuccessData({ message: res.message, inquiryId: res.inquiryId || `inq-${Date.now()}` });
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to submit inquiry';

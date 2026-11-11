@@ -37,6 +37,7 @@ import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { InteractiveSimulatorModal } from './components/InteractiveSimulators';
 import { AdminCMS } from './components/AdminCMS/AdminCMS';
 import { AuthPage } from './views/AuthPage';
+import { AdminLoginPage } from './views/AdminLoginPage';
 import { AccountView } from './views/AccountView';
 import { Shield, ArrowLeft } from 'lucide-react';
 
@@ -338,19 +339,14 @@ export default function App() {
         );
       }
 
-      // Not logged in: Show Auth page
+      // Not logged in: Show dedicated AdminLoginPage (sign-in only, no registration)
       return (
-        <AuthPage
-          initialMode="login"
+        <AdminLoginPage
           identity={cms.identity}
-          onLoginSuccess={(profile, userIsAdmin) => {
-            if (userIsAdmin) {
-              setIsAdmin(true);
-              setIsAdminLoggedIn(true);
-              navigateToAdmin();
-            } else {
-              navigateToAccount();
-            }
+          onLoginSuccess={() => {
+            setIsAdmin(true);
+            setIsAdminLoggedIn(true);
+            navigateToAdmin();
           }}
           onReturnToSite={exitAdmin}
         />

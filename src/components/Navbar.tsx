@@ -71,15 +71,14 @@ export const Navbar: React.FC<NavbarProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Top header navigation exclusions: Website Design, Mobile Apps, Web Applications, Blog
-  const REMOVED_HEADER_TABS = new Set(['websites', 'mobile', 'webapps', 'blog', 'industries']);
+  // Top header navigation exclusions: Website Design, Mobile Apps, Web Applications
+  const REMOVED_HEADER_TABS = new Set(['websites', 'mobile', 'webapps', 'industries']);
   const REMOVED_HEADER_LABELS = [
     'website design',
     'mobile apps',
     'mobile application',
     'web applications',
     'web application',
-    'blog',
     'industries',
   ];
 
@@ -87,7 +86,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'nav-home', label: 'Home', tab: 'home', visible: true, order: 1 },
     { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 2 },
     { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 3 },
-    { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 4 }
+    { id: 'nav-blog', label: 'Blog', tab: 'blog', visible: true, order: 4 },
+    { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 5 }
   ];
 
   const navItems = baseItems

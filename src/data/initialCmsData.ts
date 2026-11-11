@@ -42,7 +42,8 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
       { id: 'nav-home', label: 'Home', tab: 'home', visible: true, order: 1 },
       { id: 'nav-services', label: 'Services', tab: 'services', visible: true, order: 2 },
       { id: 'nav-about', label: 'About Us', tab: 'about', visible: true, order: 3 },
-      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 4 }
+      { id: 'nav-blog', label: 'Blog', tab: 'blog', visible: true, order: 4 },
+      { id: 'nav-contact', label: 'Contact', tab: 'contact', visible: true, order: 5 }
     ],
     ctaButtonText: 'Request a Project',
     ctaDestination: 'inquiry'
@@ -344,28 +345,6 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
       published: true
     },
     {
-      id: 'srv-8',
-      title: 'Cloud Deployment and Hosting Infrastructure',
-      slug: 'cloud-hosting',
-      iconName: 'Cloud',
-      shortDescription: 'Containerized deployments on Google Cloud, AWS, or Azure with auto-scaling, load balancing, SSL, and automated CI/CD pipelines.',
-      fullDescription: 'Containerized deployments (Docker, Kubernetes) on Google Cloud Platform, AWS, or Azure with auto-scaling, load balancing, and CDN caching.',
-      benefits: [
-        'Zero-downtime rolling deployments via automated CI/CD pipelines',
-        'Elastic scaling that dynamically accommodates traffic spikes',
-        'Encrypted environment variable vault keeping keys safe'
-      ],
-      deliverables: [
-        'Infrastructure-as-Code (IaC) configuration scripts',
-        'CI/CD GitHub Actions or GitLab pipeline setup',
-        'SSL certificate provisioning and domain routing',
-        'Cloud cost optimization audit'
-      ],
-      quoteCtaText: 'Request a Quote for Cloud Deployment',
-      order: 8,
-      published: true
-    },
-    {
       id: 'srv-9',
       title: 'Maintenance, Security, and Technical Support',
       slug: 'maintenance-support',
@@ -383,8 +362,8 @@ export const DEFAULT_CMS_CONFIG: CmsConfig = {
         'Priority bug remediation ticket access',
         'Quarterly architecture review and roadmap planning'
       ],
-      quoteCtaText: 'Request a Quote for SLA Support',
-      order: 9,
+      quoteCtaText: 'Request a Quote for Maintenance and Support',
+      order: 8,
       published: true
     }
   ],

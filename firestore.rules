@@ -7,7 +7,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null &&
         request.auth.token.email_verified == true &&
-        request.auth.token.email.lower() == 'tesfayeteklufeyissa@gmail.com';
+        (request.auth.token.email.lower() == 'contactesfaye@gmail.com' || request.auth.token.email.lower() == 'tesfayeteklufeyissa@gmail.com');
     }
 
     // Helper: Validates signed-in user
