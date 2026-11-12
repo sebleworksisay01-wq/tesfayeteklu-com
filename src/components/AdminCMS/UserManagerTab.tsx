@@ -85,7 +85,7 @@ export const UserManagerTab: React.FC = () => {
 
   const handleRoleChange = async (userId: string, userEmail: string, newRole: string) => {
     if (userEmail?.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase() && newRole !== 'admin' && newRole !== 'Administrator') {
-      alert('The designated super administrator (tesfayeteklufeyissa@gmail.com) role cannot be changed.');
+      alert(`The designated super administrator (${AUTHORIZED_ADMIN_EMAIL}) role cannot be changed.`);
       return;
     }
 

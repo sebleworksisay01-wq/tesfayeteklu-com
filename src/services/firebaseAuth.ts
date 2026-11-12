@@ -244,52 +244,70 @@ export async function loginWithFirebase(
   password: string
 ): Promise<{ user: User; profile: UserProfile | null; adminUser: AdminUser | null; isAdmin: boolean }> {
   const normalizedEmail = email.trim().toLowerCase();
+  const isTargetAdmin = isAuthorizedAdminEmail(normalizedEmail);
 
   const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
   const fbUser = userCredential.user;
 
-  // Crucial: Call reload() to fetch the freshest verification status directly from Firebase Auth servers
-  await fbUser.reload();
+  // Attempt to reload token & profile
+  try {
+    await fbUser.reload();
+  } catch {
+    // Ignore network or transient reload error
+  }
   const refreshedUser = auth.currentUser || fbUser;
 
-  // Strict check: Mandatory email verification
-  if (!refreshedUser.emailVerified) {
-    // Sign out immediately so unverified sessions cannot persist in protected routes
+  // Strict check: Non-admin public accounts require email verification
+  if (!isTargetAdmin && !refreshedUser.emailVerified) {
     await fbSignOut(auth);
     throw new UnverifiedEmailError(normalizedEmail);
   }
 
   // Fetch or create profile in Firestore
   let profile = await getUserProfile(refreshedUser.uid);
-  const isTargetAdmin = isAuthorizedAdminEmail(normalizedEmail);
 
-  if (!profile) {
+  const now = new Date().toISOString();
+  if (isTargetAdmin) {
+    // Ensure administrator profile and admin index record exist in Firestore
     profile = {
       uid: refreshedUser.uid,
-      fullName: refreshedUser.displayName || (isTargetAdmin ? 'Tesfaye Teklu' : 'User'),
+      fullName: refreshedUser.displayName || 'Tesfaye Teklu',
       email: normalizedEmail,
-      role: isTargetAdmin ? 'Administrator' : 'User',
-      emailVerified: true,
+      role: 'Administrator',
+      emailVerified: Boolean(refreshedUser.emailVerified),
       accountStatus: 'active',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
+      createdAt: profile?.createdAt || now,
+      updatedAt: now,
+      lastLoginAt: now,
+    };
+
+    try {
+      // 1. Sync to users collection
+      await setDoc(doc(db, 'users', refreshedUser.uid), sanitizeForFirestore(profile as unknown as Record<string, unknown>), { merge: true });
+      // 2. Sync to admins collection for rules verification
+      await setDoc(doc(db, 'admins', refreshedUser.uid), {
+        uid: refreshedUser.uid,
+        email: normalizedEmail,
+        role: 'super_admin',
+        updatedAt: now,
+      }, { merge: true });
+    } catch (err) {
+      console.warn('Notice syncing admin profile to Firestore:', err);
+    }
+  } else if (!profile) {
+    profile = {
+      uid: refreshedUser.uid,
+      fullName: refreshedUser.displayName || 'User',
+      email: normalizedEmail,
+      role: 'User',
+      emailVerified: Boolean(refreshedUser.emailVerified),
+      accountStatus: 'active',
+      createdAt: now,
+      updatedAt: now,
+      lastLoginAt: now,
     };
     try {
       await setDoc(doc(db, 'users', refreshedUser.uid), sanitizeForFirestore(profile as unknown as Record<string, unknown>));
-    } catch {
-      // Ignore
-    }
-  } else {
-    // Keep profile in sync
-    try {
-      await updateDoc(doc(db, 'users', refreshedUser.uid), sanitizeForFirestore({
-        emailVerified: true,
-        lastLoginAt: new Date().toISOString(),
-        role: isTargetAdmin ? 'Administrator' : profile.role,
-      }));
-      profile.emailVerified = true;
-      if (isTargetAdmin) profile.role = 'Administrator';
     } catch {
       // Ignore
     }
@@ -499,23 +517,42 @@ export function subscribeToAuthState(
     const isVerified = Boolean(user.emailVerified);
     const normalizedEmail = (user.email || '').trim().toLowerCase();
     const isAdminAccount = isAuthorizedAdminEmail(normalizedEmail);
-    const adminUser = (isAdminAccount && isVerified) ? mapFirebaseUserToAdmin(user) : null;
 
-    let profile: UserProfile | null = null;
-    if (isVerified) {
-      profile = await getUserProfile(user.uid);
-      if (!profile) {
-        profile = {
+    let profile: UserProfile | null = await getUserProfile(user.uid);
+    const hasAdminRole = profile?.role === 'Administrator' || profile?.role === 'admin';
+    const isEffectiveAdmin = isAdminAccount || hasAdminRole;
+
+    const adminUser = isEffectiveAdmin
+      ? (mapFirebaseUserToAdmin(user) || {
+          id: user.uid,
+          email: user.email || normalizedEmail,
+          name: user.displayName || profile?.fullName || 'Tesfaye Teklu',
+          role: 'super_admin' as const,
+        })
+      : null;
+
+    if (isEffectiveAdmin && !profile) {
+      profile = {
+        uid: user.uid,
+        fullName: user.displayName || 'Tesfaye Teklu',
+        email: normalizedEmail,
+        role: 'Administrator',
+        emailVerified: isVerified,
+        accountStatus: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+      };
+      try {
+        await setDoc(doc(db, 'users', user.uid), sanitizeForFirestore(profile as unknown as Record<string, unknown>), { merge: true });
+        await setDoc(doc(db, 'admins', user.uid), {
           uid: user.uid,
-          fullName: user.displayName || (isAdminAccount ? 'Tesfaye Teklu' : 'User'),
           email: normalizedEmail,
-          role: isAdminAccount ? 'Administrator' : 'User',
-          emailVerified: isVerified,
-          accountStatus: 'active',
-          createdAt: new Date().toISOString(),
+          role: 'super_admin',
           updatedAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-        };
+        }, { merge: true });
+      } catch {
+        // Ignore
       }
     }
 
@@ -523,11 +560,11 @@ export function subscribeToAuthState(
       user,
       profile,
       adminUser,
-      isAuthenticated: isVerified,
-      isAdmin: Boolean(adminUser && isVerified),
+      isAuthenticated: true,
+      isAdmin: isEffectiveAdmin,
       isEmailVerified: isVerified,
       loading: false,
-      error: !isVerified
+      error: (!isVerified && !isEffectiveAdmin)
         ? `Account email is unverified. Please check ${user.email} to verify access.`
         : null,
     });

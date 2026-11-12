@@ -3,66 +3,120 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: Validates Administrator identity
-    function isAdmin() {
-      return request.auth != null &&
-        request.auth.token.email_verified == true &&
-        (request.auth.token.email.lower() == 'contactesfaye@gmail.com' || request.auth.token.email.lower() == 'tesfayeteklufeyissa@gmail.com');
-    }
+    // -------------------------------------------------------------------------
+    // Global Authentication & Authorization Helpers
+    // -------------------------------------------------------------------------
 
-    // Helper: Validates signed-in user
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // 1. Users collection (Private user accounts & Admin management)
+    // Explicit check for the authorized administrator email addresses
+    function isAuthorizedAdminEmail() {
+      return isSignedIn() &&
+        request.auth.token.email != null &&
+        (request.auth.token.email.lower() == 'contactesfaye@gmail.com' ||
+         request.auth.token.email.lower() == 'tesfayeteklufeyissa@gmail.com');
+    }
+
+    // Comprehensive Admin validation: Email, Custom Claims, or Firestore Role
+    function isAdmin() {
+      return isSignedIn() && (
+        isAuthorizedAdminEmail() ||
+        (request.auth.token.keys().hasAny(['admin']) && request.auth.token.admin == true) ||
+        (request.auth.token.keys().hasAny(['role']) && (
+          request.auth.token.role == 'admin' ||
+          request.auth.token.role == 'super_admin' ||
+          request.auth.token.role == 'Administrator'
+        )) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Administrator' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+        ))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. User Profiles & Role-Based Access Control (RBAC)
+    // -------------------------------------------------------------------------
     match /users/{userId} {
-      allow read, write:
-        if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+      // Users can only read their own profile; Admins can read all profiles
+      allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+
+      // Users can register their own initial profile as 'User', but cannot self-assign 'Administrator'
+      // Authorized admin emails and admins can create admin profiles
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        (request.auth.uid == userId && (
+          !request.resource.data.keys().hasAny(['role', 'isAdmin']) ||
+          request.resource.data.role == 'User' ||
+          isAuthorizedAdminEmail()
+        ))
+      );
+
+      // Ordinary users cannot modify their own role or isAdmin privilege
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        (request.auth.uid == userId &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin']))
+      );
+
+      // Only administrators can delete user profile documents
+      allow delete: if isAdmin();
 
       match /{document=**} {
-        allow read, write:
-          if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+        allow read, write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
       }
     }
 
-    // 2. Public / CMS Published Collections
+    // Dedicated Admins Collection (Direct UID lookup)
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. CMS Published Collections (Public Read when Published, Admin Full Access)
+    // -------------------------------------------------------------------------
     match /projects/{projectId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /services/{serviceId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /blogPosts/{postId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /testimonials/{testimonialId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /clients/{clientId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /teamMembers/{memberId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
     match /pages/{pageId} {
-      allow read: if resource.data.published == true || isAdmin();
+      allow read: if (resource != null && resource.data.published == true) || isAdmin();
       allow write: if isAdmin();
     }
 
-    // 3. Centralized Website Configuration & SEO Settings
+    // -------------------------------------------------------------------------
+    // 3. Centralized Website Configuration & SEO Settings (Public Read, Admin Write)
+    // -------------------------------------------------------------------------
     match /siteSettings/{settingId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -93,13 +147,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // 4. Inquiries (Client Quote Requests)
+    // -------------------------------------------------------------------------
+    // 4. Inquiries & Contact Messages (Public Submit, Admin Manage)
+    // -------------------------------------------------------------------------
     match /inquiries/{inquiryId} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // 5. Protected Administrative Collections
+    // -------------------------------------------------------------------------
+    // 5. Protected Administrative Collections (Strict Admin-Only)
+    // -------------------------------------------------------------------------
     match /contentRevisions/{revisionId} {
       allow read, write: if isAdmin();
     }
@@ -109,6 +167,10 @@ service cloud.firestore {
     }
 
     match /adminData/{dataId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /auditLogs/{logId} {
       allow read, write: if isAdmin();
     }
   }

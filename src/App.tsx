@@ -15,7 +15,8 @@ import {
   testConnection, 
   subscribeToAuthState,
   logoutAdmin,
-  AUTHORIZED_ADMIN_EMAIL
+  AUTHORIZED_ADMIN_EMAIL,
+  isAuthorizedAdminEmail,
 } from './services/api';
 import { DEFAULT_CMS_CONFIG } from './data/initialCmsData';
 import { INITIAL_PROJECTS } from './data/seedData';
@@ -104,10 +105,11 @@ export default function App() {
     const unsubscribeAuth = subscribeToAuthState((authState) => {
       setCurrentUser(authState.user);
       setUserProfile(authState.profile);
-      setIsAdmin(authState.isAdmin);
       if (authState.isAdmin) {
+        setIsAdmin(true);
         setIsAdminLoggedIn(true);
-      } else {
+      } else if (!getAuthToken()) {
+        setIsAdmin(false);
         setIsAdminLoggedIn(false);
       }
       setAuthChecking(false);
@@ -155,9 +157,8 @@ export default function App() {
 
   const checkAdmin = async () => {
     try {
-      setAuthChecking(true);
       const res = await verifyAdmin();
-      if (res.authenticated && res.user?.email === AUTHORIZED_ADMIN_EMAIL) {
+      if (res.authenticated && res.user && isAuthorizedAdminEmail(res.user.email)) {
         setIsAdminLoggedIn(true);
         setIsAdmin(true);
       }
@@ -302,8 +303,9 @@ export default function App() {
     if (!isAdmin || !isAdminLoggedIn) {
       if (authChecking) {
         return (
-          <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-xs">
-            Verifying Administrator Authentication...
+          <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 text-xs gap-3">
+            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <p className="font-medium tracking-wide text-slate-400">Loading TesfayeTech Administrator CMS...</p>
           </div>
         );
       }

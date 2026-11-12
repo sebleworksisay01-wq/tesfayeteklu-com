@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { 
   Shield, Key, Eye, EyeOff, Lock, Mail, ArrowLeft, 
-  AlertCircle, RefreshCw, Sparkles, Send
+  AlertCircle, RefreshCw, Sparkles, Send, CheckCircle2, X
 } from 'lucide-react';
 import { GlobalSiteIdentity } from '../types/cms';
 import {
   loginAdmin,
   resendVerificationEmail,
+  requestPasswordReset,
+  setupInitialAdminAccount,
   AUTHORIZED_ADMIN_EMAIL,
 } from '../services/api';
 
@@ -31,6 +33,18 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
   const [isUnverified, setIsUnverified] = useState(false);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
 
+  // Forgot Password Modal State
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState(AUTHORIZED_ADMIN_EMAIL);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+
+  // First-time setup helper state
+  const [canInitialize, setCanInitialize] = useState(false);
+  const [initLoading, setInitLoading] = useState(false);
+  const [initSuccess, setInitSuccess] = useState<string | null>(null);
+
   // Validation
   const validateEmail = (val: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
@@ -41,6 +55,8 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
     setError(null);
     setIsUnverified(false);
     setResendStatus(null);
+    setCanInitialize(false);
+    setInitSuccess(null);
 
     const cleanEmail = email.trim();
     if (!cleanEmail) {
@@ -66,8 +82,15 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid email or password';
       setError(msg);
-      if (msg.toLowerCase().includes('verification required') || msg.toLowerCase().includes('unverified')) {
+      
+      const lower = msg.toLowerCase();
+      if (lower.includes('verification') || lower.includes('unverified')) {
         setIsUnverified(true);
+      } else if (lower.includes('user-not-found') || lower.includes('no user') || lower.includes('invalid-credential')) {
+        // If it's the designated administrator, allow one-click initial provisioning
+        if (cleanEmail === AUTHORIZED_ADMIN_EMAIL || cleanEmail === 'tesfayeteklufeyissa@gmail.com') {
+          setCanInitialize(true);
+        }
       }
     } finally {
       setLoading(false);
@@ -77,10 +100,50 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
   const handleResendVerification = async () => {
     try {
       setResendStatus('Sending verification link...');
-      const res = await resendVerificationEmail();
+      const res = await resendVerificationEmail(email, password);
       setResendStatus(res.message);
     } catch (err) {
       setResendStatus(err instanceof Error ? err.message : 'Unable to resend verification.');
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError(null);
+    setForgotSuccess(null);
+
+    const cleanEmail = forgotEmail.trim();
+    if (!cleanEmail || !validateEmail(cleanEmail)) {
+      setForgotError('Please enter a valid administrator email address.');
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const res = await requestPasswordReset(cleanEmail);
+      setForgotSuccess(res.message || `Password reset link dispatched to ${cleanEmail}. Please check your inbox.`);
+    } catch (err) {
+      setForgotError(err instanceof Error ? err.message : 'Failed to send password reset email.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleInitializeAdmin = async () => {
+    if (!password || password.length < 8) {
+      setError('Password must be at least 8 characters long to initialize administrator account.');
+      return;
+    }
+    setInitLoading(true);
+    setError(null);
+    try {
+      const res = await setupInitialAdminAccount(email.trim(), password);
+      setInitSuccess(res.message);
+      setCanInitialize(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to initialize administrator account.');
+    } finally {
+      setInitLoading(false);
     }
   };
 
@@ -166,10 +229,32 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
                       <span>Resend Verification Email</span>
                     </button>
                   )}
+                  {canInitialize && (
+                    <div className="pt-2 border-t border-red-800/40">
+                      <p className="text-2xs text-slate-300 mb-1.5">First-time administrator setup?</p>
+                      <button
+                        type="button"
+                        onClick={handleInitializeAdmin}
+                        disabled={initLoading}
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-2xs flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        {initLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Key className="w-3 h-3" />}
+                        <span>Initialize Admin Account</span>
+                      </button>
+                    </div>
+                  )}
                   {resendStatus && (
                     <p className="text-2xs text-emerald-300 font-medium">{resendStatus}</p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Success notification */}
+            {initSuccess && (
+              <div className="mx-6 mt-6 p-3.5 bg-emerald-950/50 border border-emerald-800/60 text-emerald-200 text-xs rounded-xl flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="flex-1 leading-normal">{initSuccess}</div>
               </div>
             )}
 
@@ -232,7 +317,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
                 </div>
               </div>
 
-              {/* Remember Me Checkbox */}
+              {/* Remember Me Checkbox & Forgot Password Link */}
               <div className="flex items-center justify-between pt-1">
                 <label className="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer select-none">
                   <input
@@ -243,6 +328,18 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
                   />
                   <span>Remember me on this browser</span>
                 </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotError(null);
+                    setForgotSuccess(null);
+                    setForgotEmail(email || AUTHORIZED_ADMIN_EMAIL);
+                    setShowForgotPassword(true);
+                  }}
+                  className="text-xs text-blue-400 hover:text-blue-300 font-medium transition cursor-pointer"
+                >
+                  Forgot Password?
+                </button>
               </div>
 
               {/* Submit Button with Loading Indicator */}
@@ -269,6 +366,91 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
 
         </div>
       </main>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95">
+            <button
+              onClick={() => setShowForgotPassword(false)}
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                <Key className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Reset Password</h3>
+                <p className="text-xs text-slate-400">Receive a secure Firebase recovery link</p>
+              </div>
+            </div>
+
+            {forgotSuccess ? (
+              <div className="space-y-4">
+                <div className="p-3.5 bg-emerald-950/60 border border-emerald-800/80 text-emerald-200 text-xs rounded-xl flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <p>{forgotSuccess}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(false)}
+                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                >
+                  Return to Sign In
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                {forgotError && (
+                  <div className="p-3 bg-red-950/60 border border-red-800/80 text-red-200 text-xs rounded-xl flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>{forgotError}</span>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Administrator Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder={AUTHORIZED_ADMIN_EMAIL}
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-750 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+
+                <div className="flex gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    {forgotLoading ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Send className="w-3.5 h-3.5" />
+                    )}
+                    <span>Send Reset Link</span>
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Bottom Footer Note */}
       <footer className="relative z-10 w-full py-4 text-center text-2xs text-slate-500 max-w-7xl mx-auto px-6">

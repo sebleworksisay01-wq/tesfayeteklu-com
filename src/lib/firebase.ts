@@ -10,29 +10,27 @@ import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { initializeFirestore, getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
+import appletConfig from '../../firebase-applet-config.json';
 
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyD0IwWim2GP7vt_3BjuIXBQg3byfk3ov4U",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "tesfayeteklu-com.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "tesfayeteklu-com",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "tesfayeteklu-com.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "414838731101",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:414838731101:web:873d7070908a601445b8b4"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || appletConfig.apiKey || "AIzaSyD0IwWim2GP7vt_3BjuIXBQg3byfk3ov4U",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || appletConfig.authDomain || "tesfayeteklu-com.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || appletConfig.projectId || "tesfayeteklu-com",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || appletConfig.storageBucket || "tesfayeteklu-com.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || appletConfig.messagingSenderId || "414838731101",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || appletConfig.appId || "1:414838731101:web:e14979dcb4a47cda45b8b4"
 };
+
+export const FIRESTORE_DATABASE_ID = 
+  import.meta.env.VITE_FIREBASE_DATABASE_ID || 
+  appletConfig.firestoreDatabaseId || 
+  "ai-studio-tesfayetechsoftw-1cd9edb1-6921-4952-ace8-6ec3f56563c6";
 
 // Singleton initialization to prevent multiple Firebase app instances
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth: Auth = getAuth(app);
-export const db: Firestore = (() => {
-  try {
-    return initializeFirestore(app, {
-      ignoreUndefinedProperties: true,
-    });
-  } catch {
-    return getFirestore(app);
-  }
-})();
+export const db: Firestore = getFirestore(app, FIRESTORE_DATABASE_ID);
 export const storage: FirebaseStorage = getStorage(app);
 
 // ----------------------------------------------------

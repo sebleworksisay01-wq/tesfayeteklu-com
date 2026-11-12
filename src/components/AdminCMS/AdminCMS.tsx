@@ -8,6 +8,12 @@ import {
   loginAdmin, logoutAdmin, verifyAdmin, changeAdminPassword,
   downloadBackup, restoreBackup, resetSystemToDefaults,
 } from '../../services/api';
+import { auth } from '../../lib/firebase';
+import { 
+  isAuthorizedAdminEmail, 
+  mapFirebaseUserToAdmin, 
+  subscribeToAuthState 
+} from '../../services/firebaseAuth';
 import { 
   Shield, Key, LogOut, CheckCircle2, 
   Search, Filter, Eye, EyeOff, Save, RefreshCw, MessageSquare, 
@@ -101,12 +107,27 @@ export const AdminCMS: React.FC<AdminCMSProps> = ({
 
   useEffect(() => {
     checkAuth();
+    const unsubscribe = subscribeToAuthState((state) => {
+      if (state.isAdmin && state.adminUser) {
+        setIsAuthenticated(true);
+        setAdminUser(state.adminUser);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   const checkAuth = async () => {
+    // 1. Direct check of current Firebase Auth state
+    if (auth.currentUser && isAuthorizedAdminEmail(auth.currentUser.email)) {
+      setIsAuthenticated(true);
+      setAdminUser(mapFirebaseUserToAdmin(auth.currentUser));
+      loadMasterData();
+      return;
+    }
+
     try {
       const res = await verifyAdmin();
-      if (res.authenticated && res.user) {
+      if (res.authenticated && res.user && isAuthorizedAdminEmail(res.user.email)) {
         setIsAuthenticated(true);
         setAdminUser(res.user);
         loadMasterData();
